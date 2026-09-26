@@ -1,1676 +1,1752 @@
-import { useEffect, useState } from 'react'
-import type { ReactNode } from 'react'
-import type { FormEvent } from 'react'
 import {
-  AnimatePresence,
-  motion,
-  useScroll,
-  useSpring,
-} from 'framer-motion'
-import type { Transition } from 'framer-motion'
+  BrowserRouter,
+  Link,
+  NavLink,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import {
-  ArrowDown,
-  ArrowLeft,
+  ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
   Check,
+  ChevronDown,
   Code2,
-  Cpu,
+  Database,
   Globe2,
   Layers3,
   Menu,
   MessageCircle,
+  MonitorSmartphone,
   MoveUpRight,
-  Palette,
+  PenTool,
+  Rocket,
+  Search,
   Send,
+  Settings2,
   Sparkles,
   X,
-} from 'lucide-react'
-import {
-  Link,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom'
+  Zap,
+} from "lucide-react";
+import { motion, type Transition } from "framer-motion";
+import { useEffect, useState } from "react";
 
-type Project = {
-  slug: string
-  title: string
-  category: string
-  status: 'completed' | 'development'
-  year: string
-  description: string
-  accent: string
-  index: string
-}
+/* =========================================================
+   PHILEdev
+   The love of development.
+   ========================================================= */
 
-const completed: Project[] = [
-  {
-    slug: 'fwl-travels-tours',
-    title: 'FWL Travels & Tours',
-    category: 'Travel / Digital Experience',
-    status: 'completed',
-    year: '2026',
-    description:
-      'A premium travel experience built around discovery, movement and a more editorial digital presence.',
-    accent: 'blue',
-    index: '01',
-  },
-  {
-    slug: 'kaycee',
-    title: 'Kaycee',
-    category: 'Music / Artist Experience',
-    status: 'completed',
-    year: '2026',
-    description:
-      'A cinematic artist landing experience designed to give the music a digital world of its own.',
-    accent: 'cyan',
-    index: '02',
-  },
-  {
-    slug: 'zoba-elite-spa',
-    title: 'ZOBA ELITE SPA & MORE',
-    category: 'Beauty / Luxury Experience',
-    status: 'completed',
-    year: '2026',
-    description:
-      'A refined digital presence for a luxury beauty and wellness brand, built around atmosphere and conversion.',
-    accent: 'ice',
-    index: '03',
-  },
-  {
-    slug: 'dreta-cares',
-    title: 'DRETA Cares',
-    category: 'Digital / Platform',
-    status: 'completed',
-    year: '2026',
-    description:
-      'A digital platform created to give care, connection and support a more intentional online experience.',
-    accent: 'blue',
-    index: '04',
-  },
-]
+const ASSETS = {
+  logo: "/assets/philedev-logo.png",
+  founderPortrait: "/assets/founder-portrait.jpg",
+  founderFull: "/assets/founder-full.jpg",
+};
 
-const development: Project[] = [
-  {
-    slug: 'edutek',
-    title: 'EduTek',
-    category: 'Education / Technology',
-    status: 'development',
-    year: 'In progress',
-    description:
-      'An education-focused technology product currently being shaped into its next stage.',
-    accent: 'cyan',
-    index: '01',
-  },
-  {
-    slug: 'onje',
-    title: 'Onje',
-    category: 'Digital Product',
-    status: 'development',
-    year: 'In progress',
-    description:
-      'A product concept under active development, with the experience and system still evolving.',
-    accent: 'blue',
-    index: '02',
-  },
-  {
-    slug: 'rektify',
-    title: 'Rektify',
-    category: 'Digital Product',
-    status: 'development',
-    year: 'In progress',
-    description:
-      'An in-development digital product being refined from idea into a functional experience.',
-    accent: 'ice',
-    index: '03',
-  },
-]
-
-const allProjects = [...completed, ...development]
-
-const navItems = [
-  { label: 'Work', to: '/work' },
-  { label: 'Services', to: '/services' },
-  { label: 'About', to: '/about' },
-  { label: 'Process', to: '/process' },
-]
-
-/*
- * Explicitly typing the transition prevents TypeScript from widening
- * the easing values into generic string/number[] types.
- */
-const revealTransition: Transition = {
-  duration: 0.7,
-  ease: [0.22, 1, 0.36, 1],
-}
-
-const heroTransition: Transition = {
-  duration: 0.9,
-  ease: [0.16, 1, 0.3, 1],
-}
-
-const pageTransition: Transition = {
-  duration: 0.45,
-  ease: [0.16, 1, 0.3, 1],
-}
+/* =========================================================
+   Shared animation
+   ========================================================= */
 
 function useReveal() {
+  const transition: Transition = {
+    duration: 0.7,
+    ease: "easeOut",
+  };
+
   return {
     initial: { opacity: 0, y: 28 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, amount: 0.18 },
-    transition: revealTransition,
-  }
+    transition,
+  };
 }
 
-function App() {
-  const { scrollYProgress } = useScroll()
+/* =========================================================
+   Image fallback
+   ========================================================= */
 
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.2,
-  })
+function SmartImage({
+  src,
+  alt,
+  className = "",
+  fallbackClassName = "",
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  fallbackClassName?: string;
+}) {
+  const [failed, setFailed] = useState(false);
 
-  const location = useLocation()
-  const [menuOpen, setMenuOpen] = useState(false)
+  if (failed) {
+    return (
+      <div
+        className={`flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-cyan-100 ${fallbackClassName} ${className}`}
+      >
+        <div className="text-center px-6">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white">
+            <Code2 size={22} />
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            PHILEdev
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+/* =========================================================
+   Data
+   ========================================================= */
+
+const completedProjects = [
+  {
+    number: "01",
+    title: "FWL Travels & Tours",
+    category: "Travel • Experience • Web",
+    description:
+      "A premium digital experience designed to position a modern travel brand with clarity, confidence and an international feel.",
+    path: "/work/fwl",
+    image:
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=85",
+  },
+  {
+    number: "02",
+    title: "Kaycee",
+    category: "Artist • Personal Brand • Web",
+    description:
+      "A clean artist-focused digital presence built around personality, visual storytelling and a strong first impression.",
+    path: "/work/kaycee",
+    image:
+      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1800&q=85",
+  },
+  {
+    number: "03",
+    title: "ZOBA ELITE SPA & MORE",
+    category: "Luxury • Beauty • Experience",
+    description:
+      "A refined luxury spa experience translating beauty, calm and premium service into a digital environment.",
+    path: "/work/zoba",
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=85",
+  },
+  {
+    number: "04",
+    title: "DRETA Cares",
+    category: "Wellbeing • Platform • Digital",
+    description:
+      "A digital platform concept created to make support and counselling services easier to approach and experience online.",
+    path: "/work/dreta",
+    image:
+      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1800&q=85",
+  },
+];
+
+const ongoingProjects = [
+  {
+    number: "01",
+    title: "EduTek",
+    category: "Education • Technology",
+    description:
+      "An education-focused technology project currently being developed to explore better ways of connecting learning and digital tools.",
+  },
+  {
+    number: "02",
+    title: "Onje",
+    category: "Digital Product • Development",
+    description:
+      "A digital product currently under development, being shaped around usability, accessibility and everyday digital experience.",
+  },
+  {
+    number: "03",
+    title: "Rektify",
+    category: "Technology • Platform",
+    description:
+      "A technology project in development focused on building a purposeful and modern digital solution.",
+  },
+];
+
+const services = [
+  {
+    icon: MonitorSmartphone,
+    number: "01",
+    title: "Digital Experiences",
+    description:
+      "Websites, landing pages and digital interfaces designed to make brands feel modern, intentional and memorable.",
+  },
+  {
+    icon: Layers3,
+    number: "02",
+    title: "Digital Products",
+    description:
+      "From web applications to platforms, we turn ideas into usable digital products built around real people.",
+  },
+  {
+    icon: Settings2,
+    number: "03",
+    title: "Intelligent Systems",
+    description:
+      "Automation, APIs, databases and connected systems that help digital products work beyond the surface.",
+  },
+  {
+    icon: Rocket,
+    number: "04",
+    title: "Digital Growth",
+    description:
+      "Digital strategy, optimisation and experiences created to help ambitious ideas move further.",
+  },
+];
+
+/* =========================================================
+   Scroll to top
+   ========================================================= */
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' })
-    setMenuOpen(false)
-  }, [location.pathname])
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
 
-  return (
-    <div className="site-shell">
-      <motion.div className="scroll-progress" style={{ scaleX }} />
-
-      <Noise />
-
-      <Header open={menuOpen} setOpen={setMenuOpen} />
-
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/work" element={<Work />} />
-          <Route path="/work/:slug" element={<ProjectDetail />} />
-          <Route
-            path="/currently-building"
-            element={<Development />}
-          />
-          <Route path="/services" element={<Services />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/process" element={<Process />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </AnimatePresence>
-
-      <Footer />
-    </div>
-  )
+  return null;
 }
 
-function Noise() {
-  return <div className="noise" aria-hidden="true" />
-}
+/* =========================================================
+   Navigation
+   ========================================================= */
 
-function Header({
-  open,
-  setOpen,
-}: {
-  open: boolean
-  setOpen: (value: boolean) => void
-}) {
-  const location = useLocation()
+function Navbar() {
+  const [open, setOpen] = useState(false);
+
+  const links = [
+    { label: "Work", to: "/work" },
+    { label: "Services", to: "/services" },
+    { label: "About", to: "/about" },
+    { label: "Process", to: "/process" },
+  ];
 
   return (
-    <>
-      <header className="header">
-        <Link to="/" className="brand" aria-label="PHILEdev home">
-          <img src="/assets/philedev-logo.png" alt="PHILEdev" />
-        </Link>
-
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navItems.map((item) => (
+    <header className="fixed left-0 right-0 top-0 z-50">
+      <div className="mx-auto max-w-[1500px] px-5 pt-4 sm:px-8 lg:px-10">
+        <div className="rounded-2xl border border-white/60 bg-white/85 px-4 py-3 shadow-[0_15px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:px-5">
+          <div className="flex items-center justify-between">
             <Link
-              key={item.to}
-              className={
-                location.pathname.startsWith(item.to)
-                  ? 'nav-link active'
-                  : 'nav-link'
-              }
-              to={item.to}
+              to="/"
+              onClick={() => setOpen(false)}
+              className="flex items-center"
             >
-              {item.label}
+              <SmartImage
+                src={ASSETS.logo}
+                alt="PHILEdev"
+                className="h-9 w-auto object-contain sm:h-10"
+                fallbackClassName="h-10 w-28 rounded-lg"
+              />
             </Link>
-          ))}
-        </nav>
 
-        <Link className="header-cta" to="/contact">
-          Start a project <ArrowUpRight size={16} />
-        </Link>
+            <nav className="hidden items-center gap-7 lg:flex">
+              {links.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `text-sm font-semibold transition ${
+                      isActive
+                        ? "text-blue-700"
+                        : "text-slate-600 hover:text-blue-700"
+                    }`
+                  }
+                >
+                  {link.label}
+                </NavLink>
+              ))}
 
-        <button
-          className="menu-button"
-          onClick={() => setOpen(!open)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-        >
-          {open ? <X /> : <Menu />}
-        </button>
-      </header>
+              <Link
+                to="/contact"
+                className="group inline-flex items-center gap-2 rounded-full bg-blue-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-800"
+              >
+                Start a Project
+                <ArrowUpRight
+                  size={16}
+                  className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                />
+              </Link>
+            </nav>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="mobile-menu"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="mobile-menu-inner">
-              <span className="eyebrow">PHILEdev / navigation</span>
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-900 lg:hidden"
+              aria-label="Toggle navigation"
+            >
+              {open ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
 
-              {[...navItems, { label: 'Contact', to: '/contact' }].map(
-                (item, i) => (
-                  <motion.div
-                    key={item.to}
-                    initial={{ opacity: 0, x: -25 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: i * 0.06,
-                      duration: 0.4,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-4 border-t border-slate-200 pt-4 lg:hidden"
+            >
+              <div className="flex flex-col gap-2">
+                {links.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    onClick={() => setOpen(false)}
+                    className="rounded-xl px-4 py-3 font-semibold text-slate-700 hover:bg-slate-100"
                   >
-                    <Link
-                      to={item.to}
-                      className="mobile-nav-link"
-                    >
-                      {item.label}
-                      <ArrowUpRight />
-                    </Link>
-                  </motion.div>
-                ),
-              )}
+                    {link.label}
+                  </Link>
+                ))}
 
-              <div className="mobile-menu-foot">
-                The love of development.
+                <Link
+                  to="/contact"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 rounded-xl bg-blue-700 px-4 py-3 text-center font-bold text-white"
+                >
+                  Start a Project
+                </Link>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  )
-}
-
-function PageIntro({
-  eyebrow,
-  title,
-  text,
-}: {
-  eyebrow: string
-  title: ReactNode
-  text?: string
-}) {
-  return (
-    <section className="page-intro">
-      <div className="container intro-grid">
-        <div>
-          <span className="eyebrow">{eyebrow}</span>
-          <h1>{title}</h1>
+            </motion.div>
+          )}
         </div>
-
-        {text && <p className="intro-copy">{text}</p>}
       </div>
-    </section>
-  )
+    </header>
+  );
 }
 
-function Home() {
+/* =========================================================
+   Page transition
+   ========================================================= */
+
+function PageTransition({ children }: { children: React.ReactNode }) {
+  const transition: Transition = {
+    duration: 0.45,
+    ease: "easeOut",
+  };
+
   return (
     <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={transition}
     >
-      <Hero />
-      <Statement />
-      <Capabilities />
-      <WorkPreview />
-      <DevelopmentPreview />
-      <Founder />
-      <Why />
-      <ProcessPreview />
-      <Philosophy />
-      <ContactCta />
+      {children}
     </motion.main>
-  )
+  );
 }
 
-function Hero() {
-  return (
-    <section className="hero">
-      <div className="hero-grid" />
-      <div className="hero-orb orb-one" />
-      <div className="hero-orb orb-two" />
+/* =========================================================
+   Hero
+   ========================================================= */
 
-      <div className="container hero-inner">
-        <div className="hero-copy">
+function Hero() {
+  const transition: Transition = {
+    duration: 0.9,
+    ease: "easeOut",
+  };
+
+  return (
+    <section className="relative min-h-screen overflow-hidden bg-[#f4f8ff] pt-28">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -right-40 -top-40 h-[600px] w-[600px] rounded-full bg-blue-200/50 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-cyan-200/40 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage:
+              "linear-gradient(#0e2f93 1px, transparent 1px), linear-gradient(90deg, #0e2f93 1px, transparent 1px)",
+            backgroundSize: "55px 55px",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto grid min-h-[calc(100vh-7rem)] max-w-[1500px] items-center gap-12 px-5 pb-16 sm:px-8 lg:grid-cols-[1.05fr_.95fr] lg:px-10">
+        <div className="max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="eyebrow-row"
+            transition={{ duration: 0.7 }}
+            className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/75 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-blue-700 shadow-sm backdrop-blur"
           >
-            <span className="status-dot" />
-            <span>Technology / Design / Development</span>
+            <Sparkles size={14} />
+            Web • Software • Digital • Experience
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.08,
-              ...heroTransition,
-            }}
+            transition={transition}
+            className="max-w-5xl text-[clamp(4rem,9vw,9rem)] font-black leading-[0.84] tracking-[-0.07em] text-slate-950"
           >
-            THERE&apos;S MORE
+            THERE'S
             <br />
-            <span>TO BUILD.</span>
+            MORE
+            <br />
+            <span className="bg-gradient-to-r from-blue-700 via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+              TO BUILD.
+            </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.2,
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="mt-8 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl"
           >
-            PHILEdev creates digital experiences, products and
-            intelligent systems for people who believe their ideas can
-            become more.
+            PHILEdev is where ideas become digital experiences, products and
+            systems built for what comes next.
           </motion.p>
 
           <motion.div
-            className="hero-actions"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.3,
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
             <Link
               to="/contact"
-              className="button button-primary"
+              className="group inline-flex items-center justify-center gap-3 rounded-full bg-blue-700 px-7 py-4 font-bold text-white shadow-xl shadow-blue-700/20 transition hover:-translate-y-1 hover:bg-blue-800"
             >
-              Start a project <ArrowUpRight size={18} />
+              START A PROJECT
+              <ArrowUpRight
+                size={18}
+                className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
+              />
             </Link>
 
             <Link
               to="/work"
-              className="button button-ghost"
+              className="inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-7 py-4 font-bold text-slate-800 transition hover:-translate-y-1 hover:border-blue-300 hover:text-blue-700"
             >
-              Explore our work <ArrowRight size={18} />
+              EXPLORE OUR WORK
+              <ArrowDownRight size={18} />
             </Link>
           </motion.div>
         </div>
 
         <motion.div
-          className="hero-portrait"
-          initial={{ opacity: 0, scale: 0.97, x: 30 }}
+          initial={{ opacity: 0, scale: 0.94, x: 30 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{
-            delay: 0.18,
-            duration: 1,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="relative mx-auto w-full max-w-xl"
         >
-          <div className="portrait-frame">
-            <img
-              src="/assets/founder-portrait.jpg"
-              alt="PHILEdev founder portrait"
-            />
+          <div className="absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-blue-300/30 via-transparent to-cyan-300/30 blur-2xl" />
 
-            <div className="portrait-caption">
-              <span>FOUNDER / PHILEdev</span>
-              <span>01 — 01</span>
+          <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-white p-2 shadow-[0_35px_100px_rgba(30,64,175,0.18)]">
+            <div className="relative overflow-hidden rounded-[2rem] bg-slate-100">
+              <SmartImage
+                src={ASSETS.founderPortrait}
+                alt="PHILEdev founder portrait"
+                className="aspect-[4/5] w-full object-cover object-center"
+                fallbackClassName="aspect-[4/5]"
+              />
+
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent p-7 pt-24">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">
+                  PHILEdev
+                </p>
+                <p className="mt-2 text-2xl font-bold text-white">
+                  Built by curiosity.
+                </p>
+              </div>
             </div>
+          </div>
+
+          <div className="absolute -bottom-5 -left-5 rounded-2xl border border-white bg-white px-5 py-4 shadow-xl">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Philosophy
+            </p>
+            <p className="mt-1 font-black text-blue-700">
+              WHAT IF THERE'S MORE?
+            </p>
           </div>
         </motion.div>
       </div>
 
-      <div className="hero-bottom container">
-        <div>WEB</div>
-        <span>•</span>
-        <div>SOFTWARE</div>
-        <span>•</span>
-        <div>DIGITAL</div>
-        <span>•</span>
-        <div>EXPERIENCE</div>
-
-        <a href="#statement" aria-label="Scroll down">
-          <ArrowDown size={18} />
-        </a>
+      <div className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 sm:flex">
+        <span>Scroll to explore</span>
+        <ArrowDownRight size={15} />
       </div>
     </section>
-  )
+  );
 }
+
+/* =========================================================
+   Statement
+   ========================================================= */
 
 function Statement() {
+  const reveal = useReveal();
+
   return (
-    <section id="statement" className="statement section">
-      <div className="container statement-grid">
-        <motion.span
-          className="section-number"
-          {...useReveal()}
-        >
-          01 / 08
-        </motion.span>
+    <section className="bg-white py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div {...reveal} className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+              01 / Philosophy
+            </p>
+          </div>
 
-        <motion.div {...useReveal()}>
-          <span className="eyebrow">
-            The PHILEdev statement
-          </span>
+          <div>
+            <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 sm:text-7xl lg:text-8xl">
+              WE BELIEVE
+              <br />
+              THERE'S <span className="text-blue-700">MORE.</span>
+            </h2>
 
-          <h2>
-            WE BELIEVE
-            <br />
-            <em>THERE&apos;S MORE.</em>
-          </h2>
-
-          <p className="large-copy">
-            More to create. More to experience. More to discover.
-            More to build.
-          </p>
-
-          <p>
-            Technology should not simply make things possible. It
-            should make better possibilities visible. That is the
-            thinking behind PHILEdev.
-          </p>
+            <p className="mt-9 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
+              More to create. More to experience. More to discover. More to
+              build. PHILEdev exists for people and businesses who refuse to
+              believe that ordinary is the only option.
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
 
-function Capabilities() {
-  const cards = [
-    {
-      n: '01',
-      icon: Globe2,
-      title: 'Digital Experiences',
-      items: [
-        'Websites',
-        'Landing pages',
-        'UI / UX design',
-        'Interactive experiences',
-      ],
-    },
-    {
-      n: '02',
-      icon: Layers3,
-      title: 'Digital Products',
-      items: [
-        'Web applications',
-        'Software systems',
-        'Mobile applications',
-        'E-commerce',
-      ],
-    },
-    {
-      n: '03',
-      icon: Cpu,
-      title: 'Intelligent Systems',
-      items: [
-        'AI solutions',
-        'Automation',
-        'API integrations',
-        'Database systems',
-      ],
-    },
-    {
-      n: '04',
-      icon: Palette,
-      title: 'Digital Growth',
-      items: [
-        'Digital strategy',
-        'SEO',
-        'Digital marketing',
-        'Brand & visual design',
-      ],
-    },
-  ]
+/* =========================================================
+   Services preview
+   ========================================================= */
+
+function ServicesPreview() {
+  const reveal = useReveal();
 
   return (
-    <section className="section capabilities">
-      <div className="container">
-        <div className="section-head">
+    <section className="bg-[#eef5ff] py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div
+          {...reveal}
+          className="mb-14 flex flex-col justify-between gap-7 lg:flex-row lg:items-end"
+        >
           <div>
-            <span className="eyebrow">02 / Capabilities</span>
-            <h2>
-              WHAT WE
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+              02 / Capabilities
+            </p>
+            <h2 className="mt-4 max-w-3xl text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
+              BUILT FOR
               <br />
-              <em>BUILD.</em>
+              WHAT'S NEXT.
             </h2>
           </div>
 
-          <p>
-            From a sharp landing page to a complete digital product,
-            PHILEdev combines design thinking with engineering to
-            turn ideas into usable experiences.
-          </p>
-        </div>
-
-        <div className="cap-grid">
-          {cards.map((card) => (
-            <motion.article
-              key={card.n}
-              className="cap-card"
-              {...useReveal()}
-            >
-              <div className="cap-top">
-                <span>{card.n}</span>
-                <card.icon size={21} />
-              </div>
-
-              <h3>{card.title}</h3>
-
-              <ul>
-                {card.items.map((x) => (
-                  <li key={x}>
-                    {x}
-                    <ArrowUpRight size={14} />
-                  </li>
-                ))}
-              </ul>
-            </motion.article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function WorkPreview() {
-  return (
-    <section className="section work-section">
-      <div className="container">
-        <div className="section-head work-head">
-          <div>
-            <span className="eyebrow">
-              03 / Selected work
-            </span>
-
-            <h2>
-              MADE
-              <br />
-              <em>REAL.</em>
-            </h2>
-          </div>
-
-          <Link to="/work" className="text-link">
-            View all work <ArrowUpRight />
-          </Link>
-        </div>
-
-        <div className="project-stack">
-          {completed.map((project, i) => (
-            <ProjectCard
-              key={project.slug}
-              project={project}
-              large={i === 0 || i === 3}
+          <Link
+            to="/services"
+            className="group inline-flex items-center gap-2 font-bold text-blue-700"
+          >
+            View all services
+            <ArrowRight
+              size={18}
+              className="transition-transform group-hover:translate-x-1"
             />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ProjectCard({
-  project,
-  large = false,
-}: {
-  project: Project
-  large?: boolean
-}) {
-  return (
-    <Link
-      to={`/work/${project.slug}`}
-      className={`project-card ${large ? 'large' : ''}`}
-    >
-      <div className={`project-visual ${project.accent}`}>
-        <div className="visual-grid" />
-
-        <span className="visual-index">
-          {project.index}
-        </span>
-
-        <div className="visual-word">
-          {project.title.split(' ')[0]}
-        </div>
-
-        <div className="visual-chip">
-          PHILEdev / {project.category.split(' / ')[0]}
-        </div>
-
-        <MoveUpRight
-          className="visual-arrow"
-          size={32}
-        />
-      </div>
-
-      <div className="project-meta">
-        <div>
-          <span>{project.category}</span>
-          <h3>{project.title}</h3>
-        </div>
-
-        <span>{project.year}</span>
-      </div>
-    </Link>
-  )
-}
-
-function DevelopmentPreview() {
-  return (
-    <section className="section development-section">
-      <div className="container">
-        <div className="development-top">
-          <div>
-            <span className="eyebrow">
-              04 / In development
-            </span>
-
-            <h2>
-              CURRENTLY
-              <br />
-              <em>BUILDING.</em>
-            </h2>
-          </div>
-
-          <span className="development-note">
-            Ideas in motion. Products taking shape.
-          </span>
-        </div>
-
-        <div className="dev-list">
-          {development.map((project) => (
-            <Link
-              to="/currently-building"
-              key={project.slug}
-              className="dev-row"
-            >
-              <span>{project.index}</span>
-
-              <div>
-                <h3>{project.title}</h3>
-                <p>{project.category}</p>
-              </div>
-
-              <span className="dev-status">
-                IN PROGRESS
-              </span>
-
-              <ArrowUpRight />
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Founder() {
-  return (
-    <section className="section founder-section">
-      <div className="container founder-grid">
-        <motion.div
-          className="founder-image"
-          {...useReveal()}
-        >
-          <img
-            src="/assets/founder-full.jpg"
-            alt="Ugoji Michael Chidera, founder of PHILEdev"
-          />
-
-          <span className="image-tag">
-            UGOJI MICHAEL CHIDERA / FOUNDER
-          </span>
-        </motion.div>
-
-        <motion.div
-          className="founder-copy"
-          {...useReveal()}
-        >
-          <span className="eyebrow">
-            05 / The founder
-          </span>
-
-          <h2>
-            BUILT BY
-            <br />
-            <em>CURIOSITY.</em>
-            <br />
-            DRIVEN BY
-            <br />
-            <em>POSSIBILITY.</em>
-          </h2>
-
-          <p>
-            I have always wanted to do more, experience more and
-            know more. Technology became one of the places where
-            that curiosity could become something tangible.
-          </p>
-
-          <p>
-            PHILEdev was born from a simple belief: there is more
-            to what we can build, and more potential in the future
-            than we often see today.
-          </p>
-
-          <Link to="/about" className="text-link">
-            Meet the founder <ArrowUpRight />
           </Link>
         </motion.div>
+
+        <div className="grid gap-px overflow-hidden rounded-[2rem] border border-blue-100 bg-blue-100 md:grid-cols-2">
+          {services.map((service) => {
+            const Icon = service.icon;
+
+            return (
+              <motion.div
+                key={service.number}
+                {...reveal}
+                className="group bg-white p-8 transition hover:bg-blue-700 hover:text-white sm:p-10 lg:p-12"
+              >
+                <div className="flex items-start justify-between gap-6">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 transition group-hover:bg-white/15 group-hover:text-white">
+                    <Icon size={22} />
+                  </div>
+
+                  <span className="text-sm font-bold text-slate-300 group-hover:text-white/50">
+                    {service.number}
+                  </span>
+                </div>
+
+                <h3 className="mt-12 text-2xl font-black sm:text-3xl">
+                  {service.title}
+                </h3>
+
+                <p className="mt-4 max-w-xl leading-7 text-slate-600 transition group-hover:text-white/75">
+                  {service.description}
+                </p>
+
+                <div className="mt-8 flex items-center gap-2 text-sm font-bold text-blue-700 transition group-hover:text-white">
+                  Explore capability
+                  <ArrowUpRight size={16} />
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
-  )
+  );
 }
 
-function Why() {
-  const principles = [
-    [
-      '01',
-      'Think beyond the brief',
-      'We do not only ask what needs to be built. We ask what it could become.',
-    ],
-    [
-      '02',
-      'Design with intention',
-      'Every interface, interaction and visual decision should have a reason.',
-    ],
-    [
-      '03',
-      'Build for the future',
-      'Technology changes. The things we build should be capable of changing with it.',
-    ],
-    [
-      '04',
-      'Make the ordinary uncomfortable',
-      'If something can be better, we keep pushing.',
-    ],
-  ]
+/* =========================================================
+   Selected work
+   ========================================================= */
+
+function SelectedWork() {
+  const reveal = useReveal();
 
   return (
-    <section className="section principles-section">
-      <div className="container">
-        <div className="section-head">
+    <section className="bg-white py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div
+          {...reveal}
+          className="mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"
+        >
           <div>
-            <span className="eyebrow">
-              06 / Why PHILEdev
-            </span>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+              03 / Selected Work
+            </p>
 
-            <h2>
-              NOT JUST
+            <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
+              THINGS
               <br />
-              <em>CODE.</em>
+              WE'VE BUILT.
             </h2>
           </div>
-        </div>
 
-        <div className="principles">
-          {principles.map(([n, t, d]) => (
+          <Link
+            to="/work"
+            className="inline-flex items-center gap-2 font-bold text-blue-700"
+          >
+            See all work
+            <ArrowRight size={18} />
+          </Link>
+        </motion.div>
+
+        <div className="grid gap-7 lg:grid-cols-2">
+          {completedProjects.map((project, index) => (
             <motion.div
-              className="principle"
-              key={n}
-              {...useReveal()}
+              key={project.title}
+              {...reveal}
+              transition={{
+                duration: 0.7,
+                delay: index * 0.05,
+                ease: "easeOut",
+              }}
             >
-              <span>{n}</span>
+              <Link
+                to={project.path}
+                className="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.06)]"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                  <SmartImage
+                    src={project.image}
+                    alt={project.title}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    fallbackClassName="h-full w-full"
+                  />
 
-              <div>
-                <h3>{t}</h3>
-                <p>{d}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-70" />
 
-function ProcessPreview() {
-  const steps = [
-    ['01', 'Discover'],
-    ['02', 'Define'],
-    ['03', 'Design'],
-    ['04', 'Develop'],
-    ['05', 'Deploy'],
-  ]
+                  <div className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-slate-800 backdrop-blur">
+                    {project.number}
+                  </div>
 
-  return (
-    <section className="section process-section">
-      <div className="container">
-        <div className="section-head">
-          <div>
-            <span className="eyebrow">
-              07 / The process
-            </span>
+                  <div className="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full bg-white text-blue-700 shadow-lg transition group-hover:rotate-45">
+                    <ArrowUpRight size={20} />
+                  </div>
+                </div>
 
-            <h2>
-              FROM IDEA
-              <br />
-              <em>→ REALITY.</em>
-            </h2>
-          </div>
+                <div className="p-7 sm:p-9">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+                    {project.category}
+                  </p>
 
-          <Link to="/process" className="text-link">
-            See our process <ArrowUpRight />
-          </Link>
-        </div>
+                  <h3 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                    {project.title}
+                  </h3>
 
-        <div className="process-line">
-          {steps.map(([n, t]) => (
-            <div className="process-node" key={n}>
-              <span>{n}</span>
-              <div className="node-line" />
-              <h3>{t}</h3>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Philosophy() {
-  return (
-    <section className="philosophy">
-      <div className="container">
-        <span className="eyebrow">
-          08 / The question
-        </span>
-
-        <h2>
-          WHAT IF
-          <br />
-          THERE&apos;S
-          <br />
-          <em>MORE?</em>
-        </h2>
-
-        <p>
-          More possibilities. More experiences. More technology.
-          More ways to solve the problem. More things worth
-          building.
-        </p>
-
-        <Link to="/contact" className="button button-light">
-          Let&apos;s find out <ArrowUpRight />
-        </Link>
-      </div>
-    </section>
-  )
-}
-
-function ContactCta() {
-  return (
-    <section className="section final-cta">
-      <div className="container">
-        <span className="eyebrow">
-          Have something worth building?
-        </span>
-
-        <h2>
-          LET&apos;S BUILD
-          <br />
-          <em>SOMETHING.</em>
-        </h2>
-
-        <Link
-          to="/contact"
-          className="button button-primary"
-        >
-          Start a project <ArrowUpRight />
-        </Link>
-      </div>
-    </section>
-  )
-}
-
-function Work() {
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="01 / Work"
-        title={
-          <>
-            SELECTED
-            <br />
-            <em>WORK.</em>
-          </>
-        }
-        text="A selection of digital experiences and products created through PHILEdev. Completed work is separated from ideas still taking shape."
-      />
-
-      <section className="section">
-        <div className="container">
-          <div className="portfolio-grid">
-            {completed.map((project) => (
-              <ProjectCard
-                project={project}
-                large={
-                  project.index === '01' ||
-                  project.index === '04'
-                }
-                key={project.slug}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <DevelopmentPreview />
-    </PageTransition>
-  )
-}
-
-function Development() {
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="02 / Currently building"
-        title={
-          <>
-            CURRENTLY
-            <br />
-            <em>BUILDING.</em>
-          </>
-        }
-        text="These products are still in development. Their presence here is intentional: they represent ideas in motion, not finished public launches."
-      />
-
-      <section className="section">
-        <div className="container">
-          <div className="dev-list large-list">
-            {development.map((project) => (
-              <div className="dev-row" key={project.slug}>
-                <span>{project.index}</span>
-
-                <div>
-                  <h3>{project.title}</h3>
-                  <p>{project.category}</p>
-                  <p className="dev-description">
+                  <p className="mt-4 leading-7 text-slate-600">
                     {project.description}
                   </p>
                 </div>
-
-                <span className="dev-status">
-                  IN DEVELOPMENT
-                </span>
-
-                <ArrowUpRight />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </PageTransition>
-  )
-}
-
-function Services() {
-  const services: Array<
-    [string, string, string, typeof Globe2]
-  > = [
-    [
-      '01',
-      'Digital Experiences',
-      'Websites, landing pages, responsive interfaces and immersive digital experiences designed around the people using them.',
-      Globe2,
-    ],
-    [
-      '02',
-      'Digital Products',
-      'Web applications, software systems, mobile products and e-commerce experiences built from structure to interface.',
-      Code2,
-    ],
-    [
-      '03',
-      'Intelligent Systems',
-      'AI-assisted solutions, automation, API integrations and database-driven systems that connect the pieces.',
-      Cpu,
-    ],
-    [
-      '04',
-      'Digital Growth',
-      'SEO, digital strategy, marketing, visual identity and design support for brands moving into a stronger digital space.',
-      Sparkles,
-    ],
-  ]
-
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="03 / Capabilities"
-        title={
-          <>
-            WHAT WE
-            <br />
-            <em>BUILD.</em>
-          </>
-        }
-        text="PHILEdev sits between design and engineering. The exact combination changes with the problem, but the standard remains the same: purposeful, usable and built to evolve."
-      />
-
-      <section className="section service-list-section">
-        <div className="container">
-          {services.map(
-            ([n, title, desc, Icon]) => (
-              <motion.article
-                className="service-row"
-                key={n}
-                {...useReveal()}
-              >
-                <span>{n}</span>
-                <Icon />
-
-                <div>
-                  <h2>{title}</h2>
-                  <p>{desc}</p>
-                </div>
-
-                <ArrowUpRight />
-              </motion.article>
-            ),
-          )}
-        </div>
-      </section>
-
-      <ContactCta />
-    </PageTransition>
-  )
-}
-
-function About() {
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="04 / About"
-        title={
-          <>
-            THE LOVE OF
-            <br />
-            <em>DEVELOPMENT.</em>
-          </>
-        }
-        text="PHILE is a word-form associated with love or a strong affinity. PHILEdev turns that idea into a working philosophy: a genuine love for developing, experimenting, learning and building."
-      />
-
-      <section className="section about-founder">
-        <div className="container founder-grid">
-          <div className="founder-image">
-            <img
-              src="/assets/founder-full.jpg"
-              alt="Ugoji Michael Chidera"
-            />
-
-            <span className="image-tag">
-              UGOJI MICHAEL CHIDERA / FOUNDER
-            </span>
-          </div>
-
-          <div className="founder-copy">
-            <span className="eyebrow">
-              The person behind the work
-            </span>
-
-            <h2>
-              MORE TO DO.
-              <br />
-              <em>MORE TO KNOW.</em>
-            </h2>
-
-            <p>
-              Driven by a desire to do more, experience more and
-              know more, I became deeply interested in technology
-              and development as a way of turning ideas into things
-              people can actually use.
-            </p>
-
-            <p>
-              I believe there is more to the future, and more
-              Nigerians can create, build and contribute to what
-              that future becomes.
-            </p>
-
-            <p>
-              PHILEdev is the space where that belief becomes work.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section manifesto">
-        <div className="container">
-          <span className="eyebrow">
-            A simple principle
-          </span>
-
-          <h2>
-            DON&apos;T BUILD
-            <br />
-            <em>JUST TO BUILD.</em>
-          </h2>
-
-          <p>
-            Build because there is a problem worth solving, an
-            experience worth improving, an idea worth exploring or
-            a future worth making tangible.
-          </p>
-        </div>
-      </section>
-    </PageTransition>
-  )
-}
-
-function Process() {
-  const steps = [
-    [
-      '01',
-      'Discover',
-      'We understand the idea, the audience, the problem and the opportunity before we decide what to build.',
-    ],
-    [
-      '02',
-      'Define',
-      'We turn the vision into a clearer scope, structure, priorities and technical direction.',
-    ],
-    [
-      '03',
-      'Design',
-      'We shape the visual language, user experience and interface before development becomes expensive to change.',
-    ],
-    [
-      '04',
-      'Develop',
-      'We translate the approved direction into a working, responsive and maintainable digital product.',
-    ],
-    [
-      '05',
-      'Deploy',
-      'We prepare the product for launch, test the experience and create the foundation for continued iteration.',
-    ],
-  ]
-
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="05 / Process"
-        title={
-          <>
-            FROM IDEA
-            <br />
-            <em>→ REALITY.</em>
-          </>
-        }
-        text="A simple process keeps ambitious ideas moving without losing the human problem underneath them."
-      />
-
-      <section className="section process-detail">
-        <div className="container">
-          {steps.map(([n, title, desc], i) => (
-            <motion.div
-              className="process-detail-row"
-              key={n}
-              {...useReveal()}
-            >
-              <span>{n}</span>
-
-              <div className="process-detail-line">
-                <div className="process-dot" />
-              </div>
-
-              <div>
-                <h2>{title}</h2>
-                <p>{desc}</p>
-              </div>
-
-              {i < steps.length - 1 && (
-                <ArrowDown className="process-next" />
-              )}
+              </Link>
             </motion.div>
           ))}
         </div>
-      </section>
-
-      <ContactCta />
-    </PageTransition>
-  )
+      </div>
+    </section>
+  );
 }
 
-function Contact() {
-  const [sent, setSent] = useState(false)
+/* =========================================================
+   Ongoing work
+   ========================================================= */
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSent(true)
-  }
+function OngoingWork() {
+  const reveal = useReveal();
 
   return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="06 / Contact"
-        title={
-          <>
-            HAVE SOMETHING
+    <section className="relative overflow-hidden bg-slate-950 py-28 text-white sm:py-36">
+      <div className="absolute -right-48 top-20 h-[500px] w-[500px] rounded-full bg-blue-700/20 blur-3xl" />
+      <div className="absolute -left-48 bottom-0 h-[400px] w-[400px] rounded-full bg-cyan-500/10 blur-3xl" />
+
+      <div className="relative mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div
+          {...reveal}
+          className="mb-14 max-w-4xl"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-300">
+            04 / Currently Building
+          </p>
+
+          <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] sm:text-7xl">
+            THE WORK
             <br />
-            <em>WORTH BUILDING?</em>
-          </>
-        }
-        text="Tell us what you're imagining. This form is currently a frontend enquiry experience and is ready to connect to a real backend or email workflow when you choose one."
-      />
+            ISN'T OVER.
+          </h2>
 
-      <section className="section contact-section">
-        <div className="container contact-grid">
-          <div className="contact-side">
-            <span className="eyebrow">
-              Start the conversation
-            </span>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+            Some ideas are already live. Others are still becoming. These are
+            the projects currently being shaped inside PHILEdev.
+          </p>
+        </motion.div>
 
-            <h2>
-              LET&apos;S BUILD
-              <br />
-              <em>SOMETHING.</em>
-            </h2>
-
-            <a
-              href="https://wa.me/234912027703101"
-              target="_blank"
-              rel="noreferrer"
-              className="contact-method"
+        <div className="divide-y divide-white/10 border-y border-white/10">
+          {ongoingProjects.map((project) => (
+            <motion.div
+              key={project.title}
+              {...reveal}
+              className="group grid gap-6 py-8 md:grid-cols-[80px_1fr_auto] md:items-center"
             >
-              <MessageCircle />
-              +234 912 027 703101
-              <ArrowUpRight />
-            </a>
-
-            <p>
-              Prefer WhatsApp? Start there and tell us what you
-              need. We&apos;ll shape the next step from there.
-            </p>
-          </div>
-
-          <form
-            className="project-form"
-            onSubmit={submit}
-          >
-            {[
-              ['Name', 'name', 'Your name'],
-              [
-                'Company / Organization',
-                'company',
-                'Company name',
-              ],
-              [
-                'Email / WhatsApp',
-                'contact',
-                'How should we reach you?',
-              ],
-            ].map(([label, name, placeholder]) => (
-              <label key={name}>
-                {label}
-                <input
-                  name={name}
-                  placeholder={placeholder}
-                  required
-                />
-              </label>
-            ))}
-
-            <label>
-              What are you building?
-              <select
-                name="project"
-                defaultValue=""
-              >
-                <option value="" disabled>
-                  Select a project type
-                </option>
-                <option>
-                  Website / Landing page
-                </option>
-                <option>Web application</option>
-                <option>Software system</option>
-                <option>Mobile application</option>
-                <option>Brand / Digital experience</option>
-                <option>Other</option>
-              </select>
-            </label>
-
-            <label>
-              Services required
-              <input
-                name="services"
-                placeholder="e.g. UI/UX, development, AI, SEO"
-              />
-            </label>
-
-            <div className="form-two">
-              <label>
-                Budget range
-                <select defaultValue="">
-                  <option value="" disabled>
-                    Select range
-                  </option>
-                  <option>Under ₦250,000</option>
-                  <option>₦250,000 – ₦500,000</option>
-                  <option>₦500,000 – ₦1,000,000</option>
-                  <option>₦1,000,000+</option>
-                  <option>Let&apos;s discuss</option>
-                </select>
-              </label>
-
-              <label>
-                Timeline
-                <select defaultValue="">
-                  <option value="" disabled>
-                    Select timeline
-                  </option>
-                  <option>As soon as possible</option>
-                  <option>2–4 weeks</option>
-                  <option>1–2 months</option>
-                  <option>3+ months</option>
-                  <option>Flexible</option>
-                </select>
-              </label>
-            </div>
-
-            <label>
-              Project description
-              <textarea
-                name="description"
-                placeholder="Tell us what you have in mind..."
-                rows={6}
-                required
-              />
-            </label>
-
-            <button
-              className="button button-primary submit-button"
-              type="submit"
-            >
-              {sent ? (
-                <>
-                  <Check size={18} />
-                  Enquiry captured
-                </>
-              ) : (
-                <>
-                  Start the conversation
-                  <Send size={17} />
-                </>
-              )}
-            </button>
-
-            {sent && (
-              <p className="form-note">
-                Demo submission recorded on this page. No email has
-                been sent yet because a live backend has not been
-                connected.
-              </p>
-            )}
-          </form>
-        </div>
-      </section>
-    </PageTransition>
-  )
-}
-
-function ProjectDetail() {
-  const { slug } = useParams()
-  const navigate = useNavigate()
-
-  const project = allProjects.find(
-    (item) => item.slug === slug,
-  )
-
-  if (!project) return <NotFound />
-
-  const isDevelopment =
-    project.status === 'development'
-
-  return (
-    <PageTransition>
-      <section className="project-detail-hero">
-        <div className="container">
-          <button
-            className="back-button"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft size={16} />
-            Back to work
-          </button>
-
-          <span className="eyebrow">
-            {project.category} / {project.year}
-          </span>
-
-          <h1>
-            {project.title}
-            <span>.</span>
-          </h1>
-
-          <div className="detail-visual">
-            <div
-              className={`project-visual ${project.accent}`}
-            >
-              <div className="visual-grid" />
-
-              <span className="visual-index">
-                {project.index}
+              <span className="text-sm font-bold text-white/30">
+                {project.number}
               </span>
 
-              <div className="visual-word">
-                {project.title.split(' ')[0]}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
+                  {project.category}
+                </p>
+                <h3 className="mt-2 text-3xl font-black">{project.title}</h3>
+                <p className="mt-3 max-w-2xl leading-7 text-slate-400">
+                  {project.description}
+                </p>
               </div>
 
-              <div className="visual-chip">
-                {isDevelopment
-                  ? 'CURRENTLY BUILDING'
-                  : 'PHILEdev / COMPLETED'}
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white/60">
+                In Development
+                <Sparkles size={13} />
               </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   Founder
+   ========================================================= */
+
+function Founder() {
+  const reveal = useReveal();
+
+  return (
+    <section className="bg-[#f4f8ff] py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div
+          {...reveal}
+          className="grid items-center gap-14 lg:grid-cols-[.75fr_1.25fr]"
+        >
+          <div className="relative mx-auto w-full max-w-lg">
+            <div className="absolute -inset-5 rounded-[2.5rem] bg-blue-200/50 blur-2xl" />
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-white bg-white p-2 shadow-2xl">
+              <SmartImage
+                src={ASSETS.founderFull}
+                alt="PHILEdev founder"
+                className="aspect-[4/5] w-full object-cover object-top"
+                fallbackClassName="aspect-[4/5]"
+              />
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="section detail-copy">
-        <div className="container detail-copy-grid">
           <div>
-            <span className="eyebrow">
-              {isDevelopment
-                ? 'In development'
-                : 'Project overview'}
-            </span>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+              05 / The Founder
+            </p>
 
-            <h2>
-              {isDevelopment
-                ? 'AN IDEA IN MOTION.'
-                : 'MADE REAL.'}
+            <h2 className="mt-4 text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 sm:text-7xl">
+              BUILT BY
+              <br />
+              CURIOSITY.
+              <br />
+              <span className="text-blue-700">DRIVEN BY</span>
+              <br />
+              POSSIBILITY.
             </h2>
-          </div>
 
-          <div>
-            <p className="large-copy">
-              {project.description}
+            <p className="mt-8 text-2xl font-bold text-slate-900">
+              Ugoji Michael Chidera
             </p>
 
-            <p>
-              {isDevelopment
-                ? 'This project page intentionally avoids presenting unfinished functionality as a live product. As development progresses, its actual features, visuals and story can replace this placeholder narrative.'
-                : 'This project page is structured to become a proper case study. Once project-specific screenshots, objectives and measurable outcomes are added, they can be presented here without changing the overall PHILEdev architecture.'}
+            <p className="mt-1 text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">
+              Founder • PHILEdev
             </p>
+
+            <div className="mt-7 max-w-2xl space-y-5 text-lg leading-8 text-slate-600">
+              <p>
+                PHILEdev was born from a simple idea: there is always more to
+                discover, more to learn and more to build.
+              </p>
+
+              <p>
+                Driven by a love for technology and development, Michael is
+                interested in what happens when creativity, technology and
+                possibility meet.
+              </p>
+
+              <p>
+                PHILEdev is built for people who see that same possibility in
+                their ideas and want to turn it into something real.
+              </p>
+            </div>
 
             <Link
-              to="/contact"
-              className="text-link"
+              to="/about"
+              className="mt-9 inline-flex items-center gap-2 font-bold text-blue-700"
             >
-              Build something with PHILEdev
-              <ArrowUpRight />
+              More about PHILEdev
+              <ArrowRight size={18} />
             </Link>
           </div>
-        </div>
-      </section>
-
-      <section className="section case-study-placeholder">
-        <div className="container">
-          <div className="case-grid">
-            <div>
-              <span>01</span>
-              <h3>The challenge</h3>
-              <p>
-                Project-specific challenge details can be added
-                here.
-              </p>
-            </div>
-
-            <div>
-              <span>02</span>
-              <h3>The approach</h3>
-              <p>
-                Design, product and engineering decisions can be
-                documented here.
-              </p>
-            </div>
-
-            <div>
-              <span>03</span>
-              <h3>The result</h3>
-              <p>
-                Outcome, launch status and measurable impact can be
-                added here when verified.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <ContactCta />
-    </PageTransition>
-  )
+        </motion.div>
+      </div>
+    </section>
+  );
 }
 
-function NotFound() {
-  return (
-    <PageTransition>
-      <PageIntro
-        eyebrow="404 / Not found"
-        title={
-          <>
-            THAT PAGE
-            <br />
-            <em>DOESN&apos;T EXIST.</em>
-          </>
-        }
-        text="Let's get you back to something worth building."
-      />
+/* =========================================================
+   Why PHILEdev
+   ========================================================= */
 
-      <section className="section">
-        <div className="container">
+function WhyPhiledev() {
+  const reveal = useReveal();
+
+  const points = [
+    "Think Beyond the Brief",
+    "Design with Intention",
+    "Build for the Future",
+    "Make the Ordinary Uncomfortable",
+  ];
+
+  return (
+    <section className="bg-white py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div {...reveal}>
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+            06 / Why PHILEdev
+          </p>
+
+          <div className="mt-10 divide-y divide-slate-200 border-y border-slate-200">
+            {points.map((point, index) => (
+              <div
+                key={point}
+                className="group flex items-center justify-between gap-5 py-7"
+              >
+                <div className="flex items-center gap-5">
+                  <span className="text-xs font-bold text-slate-300">
+                    0{index + 1}
+                  </span>
+
+                  <h3 className="text-2xl font-black tracking-tight text-slate-950 transition group-hover:text-blue-700 sm:text-4xl">
+                    {point}
+                  </h3>
+                </div>
+
+                <ArrowUpRight
+                  size={22}
+                  className="shrink-0 text-slate-300 transition group-hover:text-blue-700"
+                />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   Process
+   ========================================================= */
+
+function Process() {
+  const reveal = useReveal();
+
+  const steps = [
+    ["01", "Discover", "We understand the idea, the people and the problem."],
+    ["02", "Define", "We turn the idea into a clear digital direction."],
+    ["03", "Design", "We shape the experience, interface and visual language."],
+    ["04", "Develop", "We turn the design into a functional digital product."],
+    ["05", "Deploy", "We launch, test and prepare the product for the real world."],
+  ];
+
+  return (
+    <section className="bg-[#eef5ff] py-28 sm:py-36">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <motion.div {...reveal} className="mb-14">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+            07 / Process
+          </p>
+
+          <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
+            FROM IDEA
+            <br />
+            TO REALITY.
+          </h2>
+        </motion.div>
+
+        <div className="grid gap-px overflow-hidden rounded-[2rem] border border-blue-100 bg-blue-100 md:grid-cols-5">
+          {steps.map(([number, title, description]) => (
+            <motion.div
+              key={number}
+              {...reveal}
+              className="bg-white p-7 sm:p-8"
+            >
+              <span className="text-sm font-black text-blue-700">{number}</span>
+
+              <h3 className="mt-12 text-2xl font-black text-slate-950">
+                {title}
+              </h3>
+
+              <p className="mt-4 text-sm leading-6 text-slate-600">
+                {description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   CTA
+   ========================================================= */
+
+function FinalCTA() {
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-slate-950 py-28 text-white sm:py-36">
+      <div className="absolute right-[-10%] top-[-20%] h-[500px] w-[500px] rounded-full bg-cyan-400/20 blur-3xl" />
+      <div className="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-blue-400/20 blur-3xl" />
+
+      <div className="relative mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <div className="max-w-5xl">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-200">
+            08 / Start something
+          </p>
+
+          <h2 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] sm:text-8xl lg:text-9xl">
+            HAVE
+            <br />
+            SOMETHING
+            <br />
+            WORTH
+            <br />
+            BUILDING?
+          </h2>
+
+          <p className="mt-9 max-w-2xl text-lg leading-8 text-white/70 sm:text-xl">
+            Tell us what you're imagining. We will help turn the idea into
+            something people can experience.
+          </p>
+
           <Link
-            to="/"
-            className="button button-primary"
+            to="/contact"
+            className="group mt-9 inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 font-black text-blue-800 transition hover:-translate-y-1"
           >
-            Back home <ArrowRight />
+            START A PROJECT
+            <ArrowUpRight
+              size={19}
+              className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
+            />
           </Link>
         </div>
-      </section>
-    </PageTransition>
-  )
+      </div>
+    </section>
+  );
 }
 
-function PageTransition({
-  children,
-}: {
-  children: ReactNode
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -14 }}
-      transition={pageTransition}
-    >
-      {children}
-    </motion.div>
-  )
-}
+/* =========================================================
+   Footer
+   ========================================================= */
 
 function Footer() {
   return (
-    <footer className="footer">
-      <div className="container">
-        <div className="footer-main">
+    <footer className="bg-slate-950 px-5 py-12 text-white sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1500px]">
+        <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <img
-              src="/assets/philedev-logo.png"
-              alt="PHILEdev"
-              className="footer-logo"
-            />
-
-            <p>The love of development.</p>
-          </div>
-
-          <div className="footer-links">
-            <div>
-              <span>Explore</span>
-              <Link to="/work">Work</Link>
-              <Link to="/services">Services</Link>
-              <Link to="/about">About</Link>
-              <Link to="/process">Process</Link>
+            <div className="mb-5 inline-flex rounded-xl bg-white p-2">
+              <SmartImage
+                src={ASSETS.logo}
+                alt="PHILEdev"
+                className="h-8 w-auto object-contain"
+                fallbackClassName="h-8 w-28 rounded-lg"
+              />
             </div>
 
-            <div>
-              <span>Start</span>
-              <Link to="/contact">
-                Start a project
+            <p className="max-w-sm text-sm leading-7 text-slate-400">
+              The love of development. Building digital experiences,
+              products and systems for what's next.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">
+              Explore
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 text-sm">
+              <Link className="text-slate-300 hover:text-white" to="/work">
+                Work
               </Link>
+              <Link
+                className="text-slate-300 hover:text-white"
+                to="/services"
+              >
+                Services
+              </Link>
+              <Link className="text-slate-300 hover:text-white" to="/about">
+                About
+              </Link>
+              <Link
+                className="text-slate-300 hover:text-white"
+                to="/process"
+              >
+                Process
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">
+              Contact
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 text-sm">
+              <a
+                href="tel:+234912027703101"
+                className="text-slate-300 hover:text-white"
+              >
+                +234 912 027 703 101
+              </a>
 
               <a
                 href="https://wa.me/234912027703101"
                 target="_blank"
                 rel="noreferrer"
+                className="text-slate-300 hover:text-white"
               >
                 WhatsApp
               </a>
+
+              <Link
+                to="/contact"
+                className="text-blue-300 hover:text-blue-200"
+              >
+                Start a project →
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="footer-bottom">
-          <span>
-            © 2026 PHILEdev. All rights reserved.
-          </span>
-
-          <span>Built with curiosity.</span>
+        <div className="flex flex-col justify-between gap-4 pt-7 text-xs text-slate-500 sm:flex-row">
+          <p>© {new Date().getFullYear()} PHILEdev. All rights reserved.</p>
+          <p>Learn. Create. Develop. Evolve.</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }
 
-export default App
+/* =========================================================
+   HOME
+   ========================================================= */
+
+function Home() {
+  return (
+    <>
+      <Hero />
+      <Statement />
+      <ServicesPreview />
+      <SelectedWork />
+      <OngoingWork />
+      <Founder />
+      <WhyPhiledev />
+      <Process />
+      <FinalCTA />
+    </>
+  );
+}
+
+/* =========================================================
+   Work page
+   ========================================================= */
+
+function WorkPage() {
+  return (
+    <PageShell
+      eyebrow="Portfolio"
+      title={
+        <>
+          THINGS
+          <br />
+          WE'VE BUILT.
+        </>
+      }
+      description="A selection of digital experiences and products created by PHILEdev."
+    >
+      <div className="grid gap-7 lg:grid-cols-2">
+        {completedProjects.map((project) => (
+          <Link
+            key={project.title}
+            to={project.path}
+            className="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+              <SmartImage
+                src={project.image}
+                alt={project.title}
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                fallbackClassName="h-full w-full"
+              />
+            </div>
+
+            <div className="p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">
+                {project.category}
+              </p>
+              <h3 className="mt-3 text-3xl font-black text-slate-950">
+                {project.title}
+              </h3>
+              <p className="mt-4 leading-7 text-slate-600">
+                {project.description}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <section className="mt-24 rounded-[2rem] bg-slate-950 p-8 text-white sm:p-12">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-300">
+          Currently Building
+        </p>
+
+        <h2 className="mt-4 text-4xl font-black sm:text-6xl">
+          STILL BECOMING.
+        </h2>
+
+        <div className="mt-10 divide-y divide-white/10">
+          {ongoingProjects.map((project) => (
+            <div
+              key={project.title}
+              className="flex flex-col justify-between gap-5 py-7 sm:flex-row sm:items-center"
+            >
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-white/40">
+                  {project.category}
+                </p>
+                <h3 className="mt-2 text-2xl font-black">{project.title}</h3>
+              </div>
+
+              <span className="w-fit rounded-full border border-white/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-white/60">
+                In Development
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   Services page
+   ========================================================= */
+
+function ServicesPage() {
+  return (
+    <PageShell
+      eyebrow="Capabilities"
+      title={
+        <>
+          WE BUILD
+          <br />
+          DIGITAL.
+        </>
+      }
+      description="Technology, design and digital experiences created around the people who will actually use them."
+    >
+      <div className="grid gap-5 md:grid-cols-2">
+        {services.map((service) => {
+          const Icon = service.icon;
+
+          return (
+            <div
+              key={service.number}
+              className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm sm:p-10"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                  <Icon size={22} />
+                </div>
+                <span className="font-bold text-slate-300">
+                  {service.number}
+                </span>
+              </div>
+
+              <h3 className="mt-12 text-3xl font-black text-slate-950">
+                {service.title}
+              </h3>
+
+              <p className="mt-4 max-w-xl leading-7 text-slate-600">
+                {service.description}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   About page
+   ========================================================= */
+
+function AboutPage() {
+  return (
+    <PageShell
+      eyebrow="About PHILEdev"
+      title={
+        <>
+          THE LOVE
+          <br />
+          OF
+          <br />
+          DEVELOPMENT.
+        </>
+      }
+      description="PHILEdev is a technology and digital development brand built around curiosity, creativity and the belief that there is always more possible."
+    >
+      <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="overflow-hidden rounded-[2rem] border border-white bg-white p-2 shadow-2xl">
+          <SmartImage
+            src={ASSETS.founderFull}
+            alt="PHILEdev founder"
+            className="aspect-[4/5] w-full object-cover object-top"
+            fallbackClassName="aspect-[4/5]"
+          />
+        </div>
+
+        <div className="space-y-6 text-lg leading-8 text-slate-600">
+          <p>
+            PHILEdev comes from the idea of loving development: loving the
+            process of creating, improving, learning and bringing something
+            new into existence.
+          </p>
+
+          <p>
+            The brand was founded by Ugoji Michael Chidera, driven by a desire
+            to do more, experience more and understand more about technology
+            and the possibilities it creates.
+          </p>
+
+          <p>
+            We believe the future is not simply something to wait for. It is
+            something people can participate in building.
+          </p>
+
+          <div className="rounded-3xl bg-blue-700 p-7 text-white">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-200">
+              The idea
+            </p>
+            <p className="mt-3 text-3xl font-black">
+              WHAT IF THERE'S MORE?
+            </p>
+          </div>
+        </div>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   Process page
+   ========================================================= */
+
+function ProcessPage() {
+  const steps = [
+    {
+      number: "01",
+      title: "Discover",
+      description:
+        "We learn about the idea, audience, business and problem before deciding what needs to be built.",
+    },
+    {
+      number: "02",
+      title: "Define",
+      description:
+        "We turn the problem into a clear direction, structure and digital strategy.",
+    },
+    {
+      number: "03",
+      title: "Design",
+      description:
+        "We create the visual language, user experience and interface around the people using the product.",
+    },
+    {
+      number: "04",
+      title: "Develop",
+      description:
+        "We transform the approved direction into a functional, responsive digital product.",
+    },
+    {
+      number: "05",
+      title: "Deploy",
+      description:
+        "We test, refine and launch the product, preparing it for real-world use.",
+    },
+  ];
+
+  return (
+    <PageShell
+      eyebrow="Our Process"
+      title={
+        <>
+          FROM IDEA
+          <br />
+          TO
+          <br />
+          REALITY.
+        </>
+      }
+      description="A structured process keeps creativity focused and technology purposeful."
+    >
+      <div className="space-y-5">
+        {steps.map((step) => (
+          <div
+            key={step.number}
+            className="grid gap-6 rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm sm:grid-cols-[80px_1fr] sm:p-10"
+          >
+            <span className="text-sm font-black text-blue-700">
+              {step.number}
+            </span>
+
+            <div>
+              <h3 className="text-3xl font-black text-slate-950">
+                {step.title}
+              </h3>
+              <p className="mt-4 max-w-3xl leading-7 text-slate-600">
+                {step.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   Contact page
+   ========================================================= */
+
+function ContactPage() {
+  return (
+    <PageShell
+      eyebrow="Start a Project"
+      title={
+        <>
+          LET'S BUILD
+          <br />
+          SOMETHING.
+        </>
+      }
+      description="Have an idea, business or digital problem worth exploring? Tell PHILEdev about it."
+    >
+      <div className="grid gap-10 lg:grid-cols-[1fr_.7fr]">
+        <form className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Field label="Name" placeholder="Your name" />
+            <Field label="Company" placeholder="Company / brand" />
+            <Field label="Email / WhatsApp" placeholder="How can we reach you?" />
+            <Field
+              label="Project type"
+              placeholder="Website, app, platform..."
+            />
+          </div>
+
+          <div className="mt-6">
+            <Field
+              label="Services required"
+              placeholder="What do you need help building?"
+            />
+          </div>
+
+          <div className="mt-6 grid gap-6 sm:grid-cols-2">
+            <Field label="Budget range" placeholder="Your estimated range" />
+            <Field label="Timeline" placeholder="When do you want to launch?" />
+          </div>
+
+          <div className="mt-6">
+            <label className="text-sm font-bold text-slate-900">
+              Project description
+            </label>
+            <textarea
+              rows={6}
+              placeholder="Tell us what you are imagining..."
+              className="mt-2 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            />
+          </div>
+
+          <button
+            type="button"
+            className="mt-7 inline-flex w-full items-center justify-center gap-3 rounded-full bg-blue-700 px-6 py-4 font-bold text-white transition hover:bg-blue-800"
+          >
+            SEND PROJECT ENQUIRY
+            <Send size={17} />
+          </button>
+        </form>
+
+        <div className="space-y-5">
+          <div className="rounded-[2rem] bg-slate-950 p-8 text-white sm:p-10">
+            <MessageCircle className="text-cyan-300" size={28} />
+
+            <h3 className="mt-7 text-3xl font-black">
+              Prefer a direct conversation?
+            </h3>
+
+            <p className="mt-4 leading-7 text-slate-400">
+              Reach PHILEdev directly through WhatsApp and tell us what you
+              want to build.
+            </p>
+
+            <a
+              href="https://wa.me/234912027703101"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-bold text-slate-950"
+            >
+              Chat on WhatsApp
+              <ArrowUpRight size={17} />
+            </a>
+          </div>
+
+          <div className="rounded-[2rem] border border-blue-100 bg-blue-50 p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+              PHILEdev
+            </p>
+
+            <p className="mt-4 text-2xl font-black text-slate-950">
+              The love of development.
+            </p>
+
+            <p className="mt-4 leading-7 text-slate-600">
+              Websites. Digital products. Systems. Experiences.
+            </p>
+          </div>
+        </div>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   Form field
+   ========================================================= */
+
+function Field({
+  label,
+  placeholder,
+}: {
+  label: string;
+  placeholder: string;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-bold text-slate-900">{label}</span>
+      <input
+        type="text"
+        placeholder={placeholder}
+        className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+      />
+    </label>
+  );
+}
+
+/* =========================================================
+   Generic page shell
+   ========================================================= */
+
+function PageShell({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: React.ReactNode;
+  description: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="min-h-screen bg-[#f4f8ff] pb-28 pt-36 sm:pt-44">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+        <div className="mb-20 max-w-5xl">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] text-blue-700">
+            {eyebrow}
+          </p>
+
+          <h1 className="mt-5 text-[clamp(4rem,9vw,8rem)] font-black leading-[0.85] tracking-[-0.07em] text-slate-950">
+            {title}
+          </h1>
+
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
+            {description}
+          </p>
+        </div>
+
+        {children}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   Project pages
+   ========================================================= */
+
+function ProjectPage({
+  title,
+  category,
+  description,
+  image,
+}: {
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+}) {
+  return (
+    <PageShell
+      eyebrow={category}
+      title={
+        <>
+          {title}
+          <br />
+          <span className="text-blue-700">PROJECT.</span>
+        </>
+      }
+      description={description}
+    >
+      <div className="overflow-hidden rounded-[2.5rem] border border-white bg-white p-2 shadow-2xl">
+        <SmartImage
+          src={image}
+          alt={title}
+          className="aspect-[16/8] w-full object-cover"
+          fallbackClassName="aspect-[16/8]"
+        />
+      </div>
+
+      <div className="mt-14 grid gap-8 lg:grid-cols-2">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+            Project overview
+          </p>
+
+          <h2 className="mt-4 text-4xl font-black text-slate-950">
+            A digital experience with purpose.
+          </h2>
+        </div>
+
+        <p className="text-lg leading-8 text-slate-600">
+          This project is part of the PHILEdev portfolio. More project details,
+          case-study material and supporting content can be added as the brand
+          portfolio continues to grow.
+        </p>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   App
+   ========================================================= */
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+
+      <div className="min-h-screen overflow-x-hidden bg-white font-sans text-slate-950">
+        <Navbar />
+
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <PageTransition>
+                <Home />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/work"
+            element={
+              <PageTransition>
+                <WorkPage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/services"
+            element={
+              <PageTransition>
+                <ServicesPage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/about"
+            element={
+              <PageTransition>
+                <AboutPage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/process"
+            element={
+              <PageTransition>
+                <ProcessPage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/contact"
+            element={
+              <PageTransition>
+                <ContactPage />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/work/fwl"
+            element={
+              <PageTransition>
+                <ProjectPage
+                  title="FWL Travels & Tours"
+                  category="Travel • Experience • Web"
+                  description="A premium travel experience built around discovery, movement and the excitement of seeing more of the world."
+                  image={completedProjects[0].image}
+                />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/work/kaycee"
+            element={
+              <PageTransition>
+                <ProjectPage
+                  title="Kaycee"
+                  category="Artist • Personal Brand • Web"
+                  description="A clean artist-focused digital presence designed to create a strong and memorable online identity."
+                  image={completedProjects[1].image}
+                />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/work/zoba"
+            element={
+              <PageTransition>
+                <ProjectPage
+                  title="ZOBA ELITE SPA & MORE"
+                  category="Luxury • Beauty • Experience"
+                  description="A luxury digital experience designed around beauty, calm, elegance and premium service."
+                  image={completedProjects[2].image}
+                />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="/work/dreta"
+            element={
+              <PageTransition>
+                <ProjectPage
+                  title="DRETA Cares"
+                  category="Wellbeing • Platform • Digital"
+                  description="A digital counselling platform designed to create a more approachable path toward support and connection."
+                  image={completedProjects[3].image}
+                />
+              </PageTransition>
+            }
+          />
+
+          <Route
+            path="*"
+            element={
+              <PageTransition>
+                <PageShell
+                  eyebrow="404"
+                  title={
+                    <>
+                      PAGE
+                      <br />
+                      NOT FOUND.
+                    </>
+                  }
+                  description="The page you are looking for does not exist."
+                >
+                  <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 rounded-full bg-blue-700 px-6 py-4 font-bold text-white"
+                  >
+                    Back to PHILEdev
+                    <ArrowRight size={18} />
+                  </Link>
+                </PageShell>
+              </PageTransition>
+            }
+          />
+        </Routes>
+
+        <Footer />
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
