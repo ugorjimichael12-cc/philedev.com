@@ -871,7 +871,7 @@ function Founder() {
               Founder
             </p>
             <p className="mt-1 font-black text-slate-950">
-              Ugoji Michael Chidera
+              Ugorji Michael Chidera
             </p>
           </div>
         </motion.div>
@@ -894,7 +894,7 @@ function Founder() {
             </p>
 
             <p>
-              Its founder, Ugoji Michael Chidera, is driven by a deep interest
+              Its founder, Ugorji Michael Chidera, is driven by a deep interest
               in technology and development and by the belief that more people
               can build meaningful things with the opportunities technology
               creates.
@@ -1483,7 +1483,7 @@ function ServicesPage() {
     },
     {
       icon: Sparkles,
-      title: "Brand & Digital Identity",
+      title: "Graphics, Brand & Digital Identity",
       text: "Digital-facing visual systems that help organisations communicate with clarity and confidence.",
     },
     {
