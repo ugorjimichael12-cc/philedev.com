@@ -1401,4 +1401,580 @@ function ProjectPage() {
             <SmartImage
               src={project.image}
               alt={project.title}
-              className="aspect-[16/8]
+              className="aspect-[16/8] w-full object-cover"
+            />
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-28">
+          <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
+            <div>
+              <SectionLabel number={project.number}>Project</SectionLabel>
+
+              <p className="text-sm leading-7 text-slate-500">
+                PHILEdev project portfolio
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
+                DIGITAL EXPERIENCES SHOULD HAVE A PURPOSE.
+              </h2>
+
+              <p className="mt-7 leading-8 text-slate-600">
+                This project represents PHILEdev's approach to creating
+                purposeful digital experiences. The final product, interface
+                and technical direction are shaped around the project's
+                specific audience and objectives.
+              </p>
+
+              <Link
+                to="/contact"
+                className="mt-8 inline-flex items-center gap-2 font-bold text-blue-700"
+              >
+                Start a project like this
+                <ArrowUpRight size={18} />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <FinalCTA />
+      </section>
+    </PageTransition>
+  );
+}
+
+/* =========================================================
+   SERVICES PAGE
+========================================================= */
+
+function ServicesPage() {
+  const allServices = [
+    {
+      icon: MonitorSmartphone,
+      title: "Website Design & Development",
+      text: "Responsive, modern websites designed around your brand, audience and objectives.",
+    },
+    {
+      icon: Layers3,
+      title: "Web Applications",
+      text: "Interactive web products and platforms designed to move beyond static websites.",
+    },
+    {
+      icon: PenTool,
+      title: "UI/UX Design",
+      text: "Clear, thoughtful interfaces and experiences that make digital products easier and better to use.",
+    },
+    {
+      icon: Code2,
+      title: "Software Development",
+      text: "Purpose-built software solutions designed around specific operational or business requirements.",
+    },
+    {
+      icon: Settings2,
+      title: "Automation & Integrations",
+      text: "Connected workflows, APIs and automations that reduce repetitive digital work.",
+    },
+    {
+      icon: Zap,
+      title: "AI & Digital Solutions",
+      text: "Practical applications of modern AI and digital technology to solve real problems.",
+    },
+    {
+      icon: Sparkles,
+      title: "Brand & Digital Identity",
+      text: "Digital-facing visual systems that help organisations communicate with clarity and confidence.",
+    },
+    {
+      icon: Rocket,
+      title: "Deployment & Maintenance",
+      text: "Getting digital products online and helping them remain functional as they evolve.",
+    },
+  ];
+
+  return (
+    <PageShell
+      eyebrow="Capabilities"
+      title={
+        <>
+          BUILDING
+          <br />
+          <span className="text-blue-600">DIGITAL</span>
+          <br />
+          POSSIBILITY.
+        </>
+      }
+      description="PHILEdev brings design, development and technology together to create digital products and experiences with purpose."
+    >
+      <div className="mt-16 grid gap-4 md:grid-cols-2">
+        {allServices.map((service, index) => {
+          const Icon = service.icon;
+
+          return (
+            <motion.div
+              key={service.title}
+              {...useReveal()}
+              className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+                  <Icon size={24} />
+                </div>
+
+                <span className="font-mono text-xs text-slate-300">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+
+              <h2 className="mt-8 text-2xl font-black text-slate-950">
+                {service.title}
+              </h2>
+
+              <p className="mt-4 max-w-xl leading-7 text-slate-500">
+                {service.text}
+              </p>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      <div className="mt-16">
+        <Link
+          to="/contact"
+          className="group inline-flex items-center gap-3 rounded-2xl bg-blue-700 px-6 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
+        >
+          Discuss Your Project
+          <ArrowUpRight
+            size={18}
+            className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+          />
+        </Link>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
+function AboutPage() {
+  return (
+    <PageShell
+      eyebrow="About PHILEdev"
+      title={
+        <>
+          THE LOVE
+          <br />
+          OF
+          <br />
+          <span className="text-blue-600">DEVELOPMENT.</span>
+        </>
+      }
+      description="PHILEdev is a technology and digital development brand built around curiosity, creativity and the belief that there is more to build."
+    >
+      <div className="mt-16 grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+        <div className="overflow-hidden rounded-[2.5rem] bg-slate-100">
+          <SmartImage
+            src={ASSETS.founderFull}
+            alt="PHILEdev founder"
+            className="aspect-[4/5] w-full object-cover"
+          />
+        </div>
+
+        <div>
+          <p className="text-2xl font-semibold leading-relaxed text-slate-700 md:text-3xl">
+            “There is more to the future. There is more we can build. There is
+            more we can experience.”
+          </p>
+
+          <div className="mt-8 space-y-5 leading-8 text-slate-600">
+            <p>
+              PHILEdev was built from a love for development and a desire to
+              explore what technology can make possible.
+            </p>
+
+            <p>
+              The vision is simple: work with people who believe their ideas can
+              become something greater and help turn those ideas into useful,
+              beautiful and functional digital experiences.
+            </p>
+
+            <p>
+              From websites and applications to digital systems and emerging
+              technology, PHILEdev approaches every project as an opportunity
+              to build something that has a reason to exist.
+            </p>
+          </div>
+
+          <div className="mt-10 border-l-4 border-blue-600 pl-5">
+            <p className="text-sm font-bold uppercase tracking-[0.15em] text-slate-400">
+              Founder
+            </p>
+            <p className="mt-1 text-xl font-black text-slate-950">
+              Ugoji Michael Chidera
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-24 rounded-[2.5rem] bg-slate-950 p-8 text-white md:p-12">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-blue-400">
+          PHILEdev / Philosophy
+        </p>
+
+        <h2 className="mt-6 max-w-4xl text-4xl font-black tracking-tight md:text-6xl">
+          DON'T JUST ASK WHAT TECHNOLOGY CAN DO.
+          <br />
+          ASK WHAT IT CAN MAKE POSSIBLE.
+        </h2>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   PROCESS PAGE
+========================================================= */
+
+function ProcessPage() {
+  return (
+    <PageShell
+      eyebrow="How We Work"
+      title={
+        <>
+          FROM IDEA
+          <br />
+          <span className="text-blue-600">TO REALITY.</span>
+        </>
+      }
+      description="Our process keeps the project clear, collaborative and purposeful from the first conversation through deployment."
+    >
+      <div className="mt-16 space-y-4">
+        {processSteps.map((step) => (
+          <div
+            key={step.number}
+            className="grid gap-6 rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm md:grid-cols-[100px_0.7fr_1fr] md:items-center md:p-9"
+          >
+            <span className="font-mono font-bold text-blue-600">
+              {step.number}
+            </span>
+
+            <h2 className="text-3xl font-black text-slate-950">
+              {step.title}
+            </h2>
+
+            <p className="leading-7 text-slate-500">{step.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-16">
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-3 rounded-2xl bg-blue-700 px-6 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
+        >
+          Start Your Project
+          <ArrowUpRight size={18} />
+        </Link>
+      </div>
+    </PageShell>
+  );
+}
+
+/* =========================================================
+   CONTACT PAGE
+========================================================= */
+
+function ContactPage() {
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitted(true);
+  }
+
+  return (
+    <PageTransition>
+      <section className="min-h-screen bg-[#f2f8ff] px-5 pb-24 pt-36 md:px-8 md:pb-32 md:pt-44">
+        <div className="mx-auto max-w-7xl">
+          <SectionLabel number="08">Start a Project</SectionLabel>
+
+          <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <h1 className="text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 md:text-8xl">
+                LET'S BUILD
+                <br />
+                <span className="text-blue-600">SOMETHING.</span>
+              </h1>
+
+              <p className="mt-8 max-w-xl text-lg leading-8 text-slate-600">
+                Have an idea, business, product or problem worth solving?
+                Tell us about it.
+              </p>
+
+              <div className="mt-10 rounded-[2rem] bg-white p-7 shadow-sm">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                  Direct contact
+                </p>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 flex items-center gap-3 text-xl font-black text-slate-950 transition hover:text-blue-700"
+                >
+                  <MessageCircle className="text-emerald-500" size={23} />
+                  {PHONE_NUMBER}
+                </a>
+
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                  Prefer a quick conversation? Reach PHILEdev directly on
+                  WhatsApp.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-xl shadow-blue-900/5 md:p-9">
+              {submitted ? (
+                <div className="flex min-h-[500px] flex-col items-center justify-center text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                    <Check size={30} />
+                  </div>
+
+                  <h2 className="mt-7 text-3xl font-black text-slate-950">
+                    PROJECT DETAILS RECEIVED.
+                  </h2>
+
+                  <p className="mt-4 max-w-md leading-7 text-slate-500">
+                    Your enquiry has been prepared. For the fastest response,
+                    you can also continue directly through WhatsApp.
+                  </p>
+
+                  <a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-7 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 font-bold text-white"
+                  >
+                    <MessageCircle size={18} />
+                    Continue on WhatsApp
+                  </a>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <FormField label="Name" name="name" required />
+                    <FormField label="Company" name="company" />
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <FormField
+                      label="Email / WhatsApp"
+                      name="contact"
+                      required
+                    />
+
+                    <div>
+                      <label
+                        htmlFor="projectType"
+                        className="mb-2 block text-sm font-bold text-slate-700"
+                      >
+                        Type of Project
+                      </label>
+
+                      <select
+                        id="projectType"
+                        name="projectType"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      >
+                        <option>Website</option>
+                        <option>Web Application</option>
+                        <option>UI/UX Design</option>
+                        <option>Software</option>
+                        <option>Mobile Application</option>
+                        <option>Brand / Digital Identity</option>
+                        <option>AI / Automation</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <FormField label="Services Required" name="services" />
+
+                    <FormField label="Budget Range" name="budget" />
+                  </div>
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <FormField label="Timeline" name="timeline" />
+
+                    <div>
+                      <label
+                        htmlFor="source"
+                        className="mb-2 block text-sm font-bold text-slate-700"
+                      >
+                        How did you find us?
+                      </label>
+
+                      <select
+                        id="source"
+                        name="source"
+                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      >
+                        <option>Referral</option>
+                        <option>Google</option>
+                        <option>Social Media</option>
+                        <option>Portfolio</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="description"
+                      className="mb-2 block text-sm font-bold text-slate-700"
+                    >
+                      Tell us about the project
+                    </label>
+
+                    <textarea
+                      id="description"
+                      name="description"
+                      required
+                      rows={7}
+                      placeholder="What are you trying to build? What problem are you solving?"
+                      className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="group flex w-full items-center justify-center gap-3 rounded-xl bg-blue-700 px-5 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
+                  >
+                    Send Project Enquiry
+                    <Send
+                      size={18}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
+
+                  <p className="text-center text-xs leading-5 text-slate-400">
+                    No payment is required to submit an enquiry.
+                  </p>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </PageTransition>
+  );
+}
+
+function FormField({
+  label,
+  name,
+  required = false,
+}: {
+  label: string;
+  name: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label
+        htmlFor={name}
+        className="mb-2 block text-sm font-bold text-slate-700"
+      >
+        {label}
+      </label>
+
+      <input
+        id={name}
+        name={name}
+        required={required}
+        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+      />
+    </div>
+  );
+}
+
+/* =========================================================
+   404
+========================================================= */
+
+function NotFound() {
+  return (
+    <PageTransition>
+      <section className="flex min-h-screen items-center justify-center bg-[#f2f8ff] px-5 py-32">
+        <div className="text-center">
+          <p className="font-mono text-sm font-bold text-blue-600">
+            ERROR / 404
+          </p>
+
+          <h1 className="mt-4 text-6xl font-black tracking-[-0.05em] text-slate-950 md:text-8xl">
+            NOT FOUND.
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-md leading-7 text-slate-500">
+            This page doesn't exist, but there's always more to build.
+          </p>
+
+          <Link
+            to="/"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white"
+          >
+            Return Home
+            <ArrowRight size={17} />
+          </Link>
+        </div>
+      </section>
+    </PageTransition>
+  );
+}
+
+/* =========================================================
+   APP
+   IMPORTANT:
+   BrowserRouter IS NOT HERE.
+   It already exists in main.tsx.
+========================================================= */
+
+function App() {
+  return (
+    <>
+      <ScrollToTop />
+
+      <div className="min-h-screen overflow-x-hidden bg-white font-sans text-slate-950">
+        <Navbar />
+
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+
+            <Route path="/work" element={<WorkPage />} />
+
+            <Route path="/work/:slug" element={<ProjectPage />} />
+
+            <Route path="/services" element={<ServicesPage />} />
+
+            <Route path="/about" element={<AboutPage />} />
+
+            <Route path="/process" element={<ProcessPage />} />
+
+            <Route path="/contact" element={<ContactPage />} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </main>
+
+        <Footer />
+      </div>
+    </>
+  );
+}
+
+export default App;
