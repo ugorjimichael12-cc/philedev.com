@@ -1,11 +1,11 @@
 import {
-  BrowserRouter,
   Link,
   NavLink,
   Route,
   Routes,
   useLocation,
 } from "react-router-dom";
+
 import {
   ArrowDownRight,
   ArrowRight,
@@ -13,8 +13,6 @@ import {
   Check,
   ChevronRight,
   Code2,
-  Database,
-  Globe2,
   Layers3,
   Menu,
   MessageCircle,
@@ -27,19 +25,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
+
 import { motion, type Transition } from "framer-motion";
 import { useEffect, useState, type ReactNode } from "react";
 
 /* =========================================================
-   PHILEdev
-   The love of development.
-   ========================================================= */
+   PHILEdev — GLOBAL CONFIG
+========================================================= */
 
-/*
-  IMPORTANT:
-  These files are inside /public directly.
-  Therefore they MUST NOT have /assets/ in front of them.
-*/
 const ASSETS = {
   logo: "/philedev-logo.png",
   founderPortrait: "/founder-portrait.jpg",
@@ -51,51 +44,82 @@ const PHONE_NUMBER = "+234 912 077 0311";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 /* =========================================================
-   Shared animation
-   ========================================================= */
+   MOTION
+========================================================= */
+
+const revealTransition: Transition = {
+  duration: 0.7,
+  ease: "easeOut",
+};
 
 function useReveal() {
-  const transition: Transition = {
-    duration: 0.7,
-    ease: "easeOut",
-  };
-
   return {
-    initial: { opacity: 0, y: 28 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, amount: 0.15 },
-    transition,
+    initial: {
+      opacity: 0,
+      y: 28,
+    },
+    whileInView: {
+      opacity: 1,
+      y: 0,
+    },
+    viewport: {
+      once: true,
+      amount: 0.15,
+    },
+    transition: revealTransition,
   };
 }
 
 /* =========================================================
-   Image component
-   ========================================================= */
+   GLOBAL HELPERS
+========================================================= */
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
+  }, [pathname]);
+
+  return null;
+}
+
+function PageTransition({ children }: { children: ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 function SmartImage({
   src,
   alt,
   className = "",
-  fallbackClassName = "",
 }: {
   src: string;
   alt: string;
   className?: string;
-  fallbackClassName?: string;
 }) {
   const [failed, setFailed] = useState(false);
 
   if (failed) {
     return (
       <div
-        className={`flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 ${fallbackClassName} ${className}`}
+        className={`flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-cyan-50 ${className}`}
       >
         <div className="text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-700 text-white shadow-lg shadow-blue-700/20">
-            <Code2 size={24} />
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white">
+            <Sparkles size={22} />
           </div>
-
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-700">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             PHILEdev
           </p>
         </div>
@@ -114,373 +138,238 @@ function SmartImage({
 }
 
 /* =========================================================
-   Data
-   ========================================================= */
+   NAVIGATION
+========================================================= */
 
-const completedProjects = [
-  {
-    number: "01",
-    title: "FWL Travels & Tours",
-    category: "Travel • Experience • Web",
-    description:
-      "A premium digital experience designed for a modern travel brand with a strong international feel.",
-    path: "/work/fwl",
-    image:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=85",
-  },
-  {
-    number: "02",
-    title: "Kaycee",
-    category: "Artist • Personal Brand • Web",
-    description:
-      "A clean artist-focused digital presence built around personality, visual storytelling and a strong first impression.",
-    path: "/work/kaycee",
-    image:
-      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1800&q=85",
-  },
-  {
-    number: "03",
-    title: "ZOBA ELITE SPA & MORE",
-    category: "Luxury • Beauty • Experience",
-    description:
-      "A refined digital experience translating beauty, calm and premium service into a modern online environment.",
-    path: "/work/zoba",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1800&q=85",
-  },
-  {
-    number: "04",
-    title: "DRETA Cares",
-    category: "Wellbeing • Platform • Digital",
-    description:
-      "A digital platform concept created to make support and counselling services easier to approach online.",
-    path: "/work/dreta",
-    image:
-      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1800&q=85",
-  },
+const navigation = [
+  { label: "Home", to: "/" },
+  { label: "Work", to: "/work" },
+  { label: "Services", to: "/services" },
+  { label: "About", to: "/about" },
+  { label: "Process", to: "/process" },
 ];
-
-const ongoingProjects = [
-  {
-    number: "01",
-    title: "EduTek",
-    category: "Education • Technology",
-    description:
-      "An education-focused technology project currently being developed to explore better ways of connecting learning and digital tools.",
-  },
-  {
-    number: "02",
-    title: "Onje",
-    category: "Digital Product • Development",
-    description:
-      "A digital product currently under development, being shaped around usability, accessibility and everyday digital experience.",
-  },
-  {
-    number: "03",
-    title: "Rektify",
-    category: "Technology • Platform",
-    description:
-      "A technology project currently in development, focused on building a purposeful and modern digital solution.",
-  },
-];
-
-const services = [
-  {
-    number: "01",
-    icon: MonitorSmartphone,
-    title: "Digital Experiences",
-    description:
-      "Websites, landing pages and digital interfaces designed to make brands feel modern, intentional and memorable.",
-  },
-  {
-    number: "02",
-    icon: Layers3,
-    title: "Digital Products",
-    description:
-      "Web applications and platforms that turn ideas into useful digital products built around real people.",
-  },
-  {
-    number: "03",
-    icon: Settings2,
-    title: "Intelligent Systems",
-    description:
-      "Automation, APIs, databases and connected systems that help digital products work beyond the surface.",
-  },
-  {
-    number: "04",
-    icon: Rocket,
-    title: "Digital Growth",
-    description:
-      "Digital strategy, optimisation and experiences created to help ambitious ideas move further.",
-  },
-];
-
-const projectDetails: Record<
-  string,
-  {
-    title: string;
-    eyebrow: string;
-    description: string;
-    image: string;
-    points: string[];
-  }
-> = {
-  fwl: {
-    title: "FWL Travels & Tours",
-    eyebrow: "Travel • Digital Experience",
-    description:
-      "A premium travel experience designed to give FWL Travels & Tours a modern, international digital presence.",
-    image:
-      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=2000&q=85",
-    points: [
-      "Premium travel-focused interface",
-      "Responsive experience across devices",
-      "Clear destination and experience presentation",
-      "Designed as a foundation for future booking functionality",
-    ],
-  },
-  kaycee: {
-    title: "Kaycee",
-    eyebrow: "Artist • Personal Brand",
-    description:
-      "A focused artist website designed around personality, visual storytelling and a strong digital first impression.",
-    image:
-      "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=2000&q=85",
-    points: [
-      "Artist-focused visual identity",
-      "Responsive personal brand experience",
-      "Strong typography and visual hierarchy",
-      "Simple and memorable user journey",
-    ],
-  },
-  zoba: {
-    title: "ZOBA ELITE SPA & MORE",
-    eyebrow: "Luxury • Beauty • Experience",
-    description:
-      "A refined digital experience created around luxury, beauty, calm and premium service.",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=2000&q=85",
-    points: [
-      "Luxury-focused visual direction",
-      "Premium service presentation",
-      "Mobile-friendly experience",
-      "Direct appointment and enquiry pathway",
-    ],
-  },
-  dreta: {
-    title: "DRETA Cares",
-    eyebrow: "Wellbeing • Platform • Digital",
-    description:
-      "A digital platform concept created to make support and counselling services easier to approach and experience online.",
-    image:
-      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2000&q=85",
-    points: [
-      "Purpose-driven digital platform",
-      "Approachable user experience",
-      "Clear information architecture",
-      "Designed around privacy-conscious interaction",
-    ],
-  },
-};
-
-/* =========================================================
-   Scroll
-   ========================================================= */
-
-function ScrollToTop() {
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  }, [pathname]);
-
-  return null;
-}
-
-/* =========================================================
-   Navbar
-   ========================================================= */
 
 function Navbar() {
   const [open, setOpen] = useState(false);
 
-  const links = [
-    { label: "Work", to: "/work" },
-    { label: "Services", to: "/services" },
-    { label: "About", to: "/about" },
-    { label: "Process", to: "/process" },
-  ];
-
   return (
     <header className="fixed left-0 right-0 top-0 z-50">
-      <div className="mx-auto max-w-[1500px] px-4 pt-4 sm:px-6 lg:px-10">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-[0_15px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:px-5">
-          <div className="flex items-center justify-between">
+      <div className="mx-auto mt-4 w-[calc(100%-2rem)] max-w-7xl">
+        <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-[0_15px_50px_rgba(15,47,147,0.08)] backdrop-blur-xl md:px-5">
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className="flex items-center"
+          >
+            <SmartImage
+              src={ASSETS.logo}
+              alt="PHILEdev"
+              className="h-9 w-auto object-contain"
+            />
+          </Link>
+
+          <nav className="hidden items-center gap-1 lg:flex">
+            {navigation.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-blue-700"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="hidden lg:block">
             <Link
-              to="/"
-              onClick={() => setOpen(false)}
-              className="flex items-center"
+              to="/contact"
+              className="group flex items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:bg-blue-800"
             >
-              <SmartImage
-                src={ASSETS.logo}
-                alt="PHILEdev"
-                className="h-9 w-auto object-contain sm:h-10"
-                fallbackClassName="h-10 w-28 rounded-lg"
+              Start a Project
+              <ArrowUpRight
+                size={16}
+                className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
               />
             </Link>
-
-            <nav className="hidden items-center gap-7 lg:flex">
-              {links.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  className={({ isActive }) =>
-                    `text-sm font-bold transition ${
-                      isActive
-                        ? "text-blue-700"
-                        : "text-slate-600 hover:text-blue-700"
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
-
-              <Link
-                to="/contact"
-                className="group inline-flex items-center gap-2 rounded-full bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-700/20 transition hover:-translate-y-0.5 hover:bg-blue-800"
-              >
-                Start a Project
-                <ArrowUpRight
-                  size={16}
-                  className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                />
-              </Link>
-            </nav>
-
-            <button
-              type="button"
-              onClick={() => setOpen(!open)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-900 lg:hidden"
-              aria-label="Toggle navigation"
-            >
-              {open ? <X size={20} /> : <Menu size={20} />}
-            </button>
           </div>
 
-          {open && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="mt-4 border-t border-slate-200 pt-4 lg:hidden"
-            >
-              <div className="flex flex-col gap-2">
-                {links.map((link) => (
-                  <Link
-                    key={link.to}
-                    to={link.to}
-                    onClick={() => setOpen(false)}
-                    className="rounded-xl px-4 py-3 font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-
-                <Link
-                  to="/contact"
-                  onClick={() => setOpen(false)}
-                  className="mt-2 rounded-xl bg-blue-700 px-4 py-3 text-center font-bold text-white"
-                >
-                  Start a Project
-                </Link>
-              </div>
-            </motion.div>
-          )}
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-900 lg:hidden"
+            aria-label="Toggle navigation"
+          >
+            {open ? <X size={21} /> : <Menu size={21} />}
+          </button>
         </div>
+
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl lg:hidden"
+          >
+            {navigation.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-xl px-4 py-3 text-sm font-semibold ${
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+
+            <Link
+              to="/contact"
+              onClick={() => setOpen(false)}
+              className="mt-2 flex items-center justify-between rounded-xl bg-blue-700 px-4 py-3 font-bold text-white"
+            >
+              Start a Project
+              <ArrowUpRight size={17} />
+            </Link>
+          </motion.div>
+        )}
       </div>
     </header>
   );
 }
 
 /* =========================================================
-   Page transition
-   ========================================================= */
+   SHARED UI
+========================================================= */
 
-function PageTransition({ children }: { children: ReactNode }) {
-  const transition: Transition = {
-    duration: 0.45,
-    ease: "easeOut",
-  };
-
+function SectionLabel({
+  number,
+  children,
+}: {
+  number: string;
+  children: ReactNode;
+}) {
   return (
-    <motion.main
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={transition}
-    >
-      {children}
-    </motion.main>
+    <div className="mb-5 flex items-center gap-3">
+      <span className="font-mono text-xs font-bold text-blue-600">
+        {number}
+      </span>
+
+      <span className="h-px w-8 bg-blue-200" />
+
+      <span className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function PageShell({
+  eyebrow,
+  title,
+  description,
+  children,
+}: {
+  eyebrow: string;
+  title: ReactNode;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <PageTransition>
+      <section className="relative overflow-hidden bg-white px-5 pb-16 pt-36 md:px-8 md:pb-24 md:pt-44">
+        <div className="absolute right-[-10rem] top-20 h-80 w-80 rounded-full bg-cyan-100/60 blur-3xl" />
+        <div className="absolute left-[-10rem] top-56 h-80 w-80 rounded-full bg-blue-100/50 blur-3xl" />
+
+        <div className="relative mx-auto max-w-7xl">
+          <SectionLabel number="PHILE">{eyebrow}</SectionLabel>
+
+          <h1 className="max-w-5xl text-5xl font-black leading-[0.95] tracking-[-0.055em] text-slate-950 sm:text-6xl lg:text-8xl">
+            {title}
+          </h1>
+
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
+            {description}
+          </p>
+
+          {children}
+        </div>
+      </section>
+    </PageTransition>
+  );
+}
+
+function ProjectArrow() {
+  return (
+    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-900 shadow-lg transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1">
+      <ArrowUpRight size={19} />
+    </div>
   );
 }
 
 /* =========================================================
-   Hero
-   ========================================================= */
+   HERO
+========================================================= */
 
 function Hero() {
-  const transition: Transition = {
-    duration: 0.9,
-    ease: "easeOut",
-  };
-
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-[#f2f7ff] to-[#e8f8ff] pt-28">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -right-40 -top-40 h-[650px] w-[650px] rounded-full bg-blue-200/50 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-[550px] w-[550px] rounded-full bg-cyan-200/40 blur-3xl" />
-
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-[#f3f9ff] to-cyan-50 px-5 pb-20 pt-36 md:px-8 md:pt-44">
+      <div className="absolute inset-0 opacity-50">
         <div
-          className="absolute inset-0 opacity-[0.035]"
+          className="absolute inset-0"
           style={{
             backgroundImage:
-              "linear-gradient(#0e2f93 1px, transparent 1px), linear-gradient(90deg, #0e2f93 1px, transparent 1px)",
-            backgroundSize: "55px 55px",
+              "linear-gradient(rgba(14,47,147,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(14,47,147,0.045) 1px, transparent 1px)",
+            backgroundSize: "54px 54px",
           }}
         />
       </div>
 
-      <div className="relative mx-auto grid min-h-[calc(100vh-7rem)] max-w-[1500px] items-center gap-14 px-5 pb-20 sm:px-8 lg:grid-cols-[1.05fr_.95fr] lg:px-10">
-        <div className="max-w-5xl">
+      <div className="absolute right-[-12rem] top-20 h-[34rem] w-[34rem] rounded-full bg-blue-200/40 blur-3xl" />
+      <div className="absolute bottom-[-12rem] left-[-8rem] h-[28rem] w-[28rem] rounded-full bg-cyan-200/40 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+        <div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white/80 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-blue-700 shadow-sm backdrop-blur"
+            transition={revealTransition}
+            className="mb-7 flex items-center gap-3"
           >
-            <Sparkles size={14} />
-            Web • Software • Digital • Experience
+            <span className="rounded-full border border-blue-200 bg-white px-4 py-2 text-xs font-black tracking-[0.18em] text-blue-700 shadow-sm">
+              WEB • SOFTWARE • DIGITAL • EXPERIENCE
+            </span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 35 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={transition}
-            className="text-[clamp(4rem,9vw,9rem)] font-black leading-[0.84] tracking-[-0.075em] text-slate-950"
+            transition={{ ...revealTransition, delay: 0.08 }}
+            className="max-w-5xl text-[4.3rem] font-black leading-[0.88] tracking-[-0.065em] text-slate-950 sm:text-7xl lg:text-[8.2rem]"
           >
             THERE'S
             <br />
             MORE
+            <span className="text-blue-600">.</span>
             <br />
-            <span className="bg-gradient-to-r from-[#0e2f93] via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-              TO BUILD.
-            </span>
+            TO BUILD
+            <span className="text-cyan-500">.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-8 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl"
+            transition={{ ...revealTransition, delay: 0.16 }}
+            className="mt-8 max-w-2xl text-lg leading-8 text-slate-600 md:text-xl"
           >
             PHILEdev is where ideas become digital experiences, products and
             systems built for what comes next.
@@ -489,149 +378,194 @@ function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
+            transition={{ ...revealTransition, delay: 0.24 }}
             className="mt-9 flex flex-col gap-3 sm:flex-row"
           >
             <Link
               to="/contact"
-              className="group inline-flex items-center justify-center gap-3 rounded-full bg-blue-700 px-7 py-4 font-black text-white shadow-xl shadow-blue-700/20 transition hover:-translate-y-1 hover:bg-blue-800"
+              className="group flex items-center justify-center gap-3 rounded-2xl bg-blue-700 px-6 py-4 font-bold text-white shadow-xl shadow-blue-700/20 transition hover:-translate-y-1 hover:bg-blue-800"
             >
-              START A PROJECT
+              Start a Project
               <ArrowUpRight
                 size={18}
-                className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
+                className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
               />
             </Link>
 
             <Link
               to="/work"
-              className="inline-flex items-center justify-center gap-3 rounded-full border border-slate-300 bg-white px-7 py-4 font-black text-slate-800 transition hover:-translate-y-1 hover:border-blue-300 hover:text-blue-700"
+              className="flex items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-4 font-bold text-slate-900 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:text-blue-700"
             >
-              EXPLORE OUR WORK
+              Explore Our Work
               <ArrowDownRight size={18} />
             </Link>
           </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, x: 30 }}
+          initial={{ opacity: 0, scale: 0.95, x: 20 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="relative mx-auto w-full max-w-xl"
+          transition={{ duration: 0.9, ease: "easeOut", delay: 0.2 }}
+          className="relative"
         >
-          <div className="absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-blue-300/40 via-transparent to-cyan-300/40 blur-2xl" />
+          <div className="relative mx-auto aspect-square max-w-[520px]">
+            <div className="absolute inset-8 rounded-[3rem] bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 opacity-20 blur-2xl" />
 
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-white bg-white p-2 shadow-[0_35px_100px_rgba(30,64,175,0.18)]">
-            <div className="relative overflow-hidden rounded-[2rem] bg-slate-100">
-              <SmartImage
-                src={ASSETS.founderPortrait}
-                alt="PHILEdev founder"
-                className="aspect-[4/5] w-full object-cover object-center"
-                fallbackClassName="aspect-[4/5]"
-              />
+            <div className="absolute inset-0 rounded-[3rem] border border-blue-100 bg-white/70 shadow-[0_40px_100px_rgba(14,47,147,0.14)] backdrop-blur-sm" />
 
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent p-7 pt-28">
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-white/70">
+            <div className="absolute left-8 top-8 rounded-2xl bg-white px-4 py-3 shadow-xl">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                <span className="text-xs font-bold text-slate-700">
+                  BUILD MODE: ON
+                </span>
+              </div>
+            </div>
+
+            <div className="absolute right-8 top-28 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
+              <p className="font-mono text-xs text-blue-700">
+                POSSIBILITY // 001
+              </p>
+            </div>
+
+            <div className="absolute inset-16 flex items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-blue-700 to-cyan-500 shadow-2xl">
+              <div className="text-center text-white">
+                <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white/15 backdrop-blur">
+                  <Zap size={48} strokeWidth={1.5} />
+                </div>
+
+                <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-100">
                   PHILEdev
                 </p>
 
-                <p className="mt-2 text-2xl font-black text-white sm:text-3xl">
-                  Built by curiosity.
+                <p className="mt-3 text-2xl font-black tracking-tight">
+                  BUILD
+                  <br />
+                  WHAT'S NEXT.
                 </p>
               </div>
             </div>
-          </div>
 
-          <div className="absolute -bottom-5 -left-5 rounded-2xl border border-slate-100 bg-white px-5 py-4 shadow-xl">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
-              Philosophy
-            </p>
+            <div className="absolute bottom-7 left-7 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-xl">
+              <p className="text-xs font-bold text-slate-500">
+                DIGITAL POSSIBILITY
+              </p>
+              <p className="mt-1 font-mono text-sm text-blue-700">
+                ∞ / 01
+              </p>
+            </div>
 
-            <p className="mt-1 font-black text-blue-700">
-              WHAT IF THERE'S MORE?
-            </p>
+            <div className="absolute bottom-8 right-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-950 text-white shadow-xl">
+              <Code2 size={25} />
+            </div>
           </div>
         </motion.div>
       </div>
 
-      <div className="absolute bottom-7 left-1/2 hidden -translate-x-1/2 items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400 sm:flex">
-        <span>Scroll to explore</span>
-        <ArrowDownRight size={15} />
+      <div className="relative mx-auto mt-20 flex max-w-7xl items-center justify-between border-t border-slate-200 pt-5">
+        <p className="font-mono text-[10px] font-bold tracking-[0.2em] text-slate-400">
+          PHILEDEV / 001
+        </p>
+
+        <p className="text-xs font-semibold text-slate-400">
+          THE LOVE OF DEVELOPMENT
+        </p>
       </div>
     </section>
   );
 }
 
 /* =========================================================
-   Statement
-   ========================================================= */
+   STATEMENT
+========================================================= */
 
 function Statement() {
   const reveal = useReveal();
 
   return (
-    <section className="bg-white py-28 sm:py-36">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-        <motion.div
-          {...reveal}
-          className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]"
-        >
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-              01 / Philosophy
-            </p>
-          </div>
+    <section className="bg-white px-5 py-24 md:px-8 md:py-36">
+      <motion.div {...reveal} className="mx-auto max-w-7xl">
+        <SectionLabel number="01">The Philosophy</SectionLabel>
+
+        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 md:text-7xl">
+            WE BELIEVE
+            <br />
+            THERE'S
+            <br />
+            <span className="text-blue-600">MORE.</span>
+          </h2>
 
           <div>
-            <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 sm:text-7xl lg:text-8xl">
-              WE BELIEVE
-              <br />
-              THERE'S <span className="text-blue-700">MORE.</span>
-            </h2>
-
-            <p className="mt-9 max-w-3xl text-lg leading-8 text-slate-600 sm:text-xl">
+            <p className="max-w-2xl text-2xl font-semibold leading-relaxed text-slate-700 md:text-3xl">
               More to create. More to experience. More to discover. More to
-              build. PHILEdev exists for people and businesses who refuse to
-              believe that ordinary is the only option.
+              build.
+            </p>
+
+            <p className="mt-7 max-w-xl text-base leading-8 text-slate-500">
+              PHILEdev exists for people and organisations who refuse to stop
+              at what already exists. We turn ideas, ambitions and possibilities
+              into useful digital experiences and technology.
             </p>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
 
 /* =========================================================
-   Services preview
-   ========================================================= */
+   SERVICES PREVIEW
+========================================================= */
+
+const services = [
+  {
+    icon: MonitorSmartphone,
+    title: "Digital Experiences",
+    text: "Websites, landing pages and responsive digital experiences designed to make your brand impossible to overlook.",
+  },
+  {
+    icon: Layers3,
+    title: "Digital Products",
+    text: "Web applications, software products and interfaces built around real people, real needs and real outcomes.",
+  },
+  {
+    icon: Settings2,
+    title: "Intelligent Systems",
+    text: "Automation, APIs, databases and connected systems that make digital operations smarter and more efficient.",
+  },
+  {
+    icon: Rocket,
+    title: "Digital Growth",
+    text: "Digital strategy, SEO, content and technology designed to help ideas reach the people they were created for.",
+  },
+];
 
 function ServicesPreview() {
   const reveal = useReveal();
 
   return (
-    <section className="bg-[#eef5ff] py-28 sm:py-36">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+    <section className="bg-[#f2f8ff] px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto max-w-7xl">
         <motion.div
           {...reveal}
-          className="mb-14 flex flex-col justify-between gap-7 lg:flex-row lg:items-end"
+          className="mb-14 flex flex-col justify-between gap-8 md:flex-row md:items-end"
         >
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-              02 / Capabilities
-            </p>
+            <SectionLabel number="02">What We Build</SectionLabel>
 
-            <h2 className="mt-4 max-w-3xl text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
-              BUILT FOR
+            <h2 className="max-w-3xl text-5xl font-black tracking-[-0.05em] text-slate-950 md:text-6xl">
+              TECHNOLOGY WITH
               <br />
-              WHAT'S NEXT.
+              <span className="text-blue-600">INTENTION.</span>
             </h2>
           </div>
 
           <Link
             to="/services"
-            className="group inline-flex items-center gap-2 font-black text-blue-700"
+            className="group flex items-center gap-2 font-bold text-blue-700"
           >
-            View all services
+            Explore services
             <ArrowRight
               size={18}
               className="transition-transform group-hover:translate-x-1"
@@ -645,36 +579,38 @@ function ServicesPreview() {
 
             return (
               <motion.div
-                key={service.number}
+                key={service.title}
                 {...reveal}
                 transition={{
-                  duration: 0.7,
-                  delay: index * 0.05,
-                  ease: "easeOut",
+                  ...revealTransition,
+                  delay: index * 0.06,
                 }}
-                className="group rounded-[2rem] border border-blue-100 bg-white p-8 shadow-sm transition duration-500 hover:-translate-y-2 hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-700/20 sm:p-10 lg:p-12"
+                className="group rounded-[2rem] border border-blue-100 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 md:p-9"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 transition group-hover:bg-white/15 group-hover:text-white">
-                    <Icon size={22} />
+                <div className="flex items-start justify-between gap-8">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 transition group-hover:bg-blue-700 group-hover:text-white">
+                    <Icon size={25} />
                   </div>
 
-                  <span className="text-sm font-black text-slate-300 group-hover:text-white/50">
-                    {service.number}
+                  <span className="font-mono text-xs text-slate-300">
+                    0{index + 1}
                   </span>
                 </div>
 
-                <h3 className="mt-12 text-2xl font-black text-slate-950 group-hover:text-white sm:text-3xl">
+                <h3 className="mt-8 text-2xl font-black tracking-tight text-slate-950">
                   {service.title}
                 </h3>
 
-                <p className="mt-4 max-w-xl leading-7 text-slate-600 transition group-hover:text-white/75">
-                  {service.description}
+                <p className="mt-4 max-w-xl leading-7 text-slate-500">
+                  {service.text}
                 </p>
 
-                <div className="mt-8 flex items-center gap-2 text-sm font-black text-blue-700 transition group-hover:text-white">
+                <div className="mt-8 flex items-center gap-2 text-sm font-bold text-blue-700">
                   Explore capability
-                  <ArrowUpRight size={16} />
+                  <ChevronRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
                 </div>
               </motion.div>
             );
@@ -686,84 +622,148 @@ function ServicesPreview() {
 }
 
 /* =========================================================
-   Selected work
-   ========================================================= */
+   PROJECT DATA
+========================================================= */
+
+const completedProjects = [
+  {
+    slug: "fwl-travels-tours",
+    number: "01",
+    title: "FWL Travels & Tours",
+    category: "Travel • Tourism • Digital Experience",
+    description:
+      "A premium travel experience designed around discovery, destinations and the future of digital travel.",
+    image:
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1400&q=85",
+  },
+  {
+    slug: "kaycee",
+    number: "02",
+    title: "Kaycee",
+    category: "Artist • Personal Brand • Web",
+    description:
+      "A clean digital presence built to give an artist a focused, memorable and professional online home.",
+    image:
+      "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=1400&q=85",
+  },
+  {
+    slug: "zoba-elite-spa",
+    number: "03",
+    title: "ZOBA ELITE SPA & MORE",
+    category: "Luxury • Beauty • Brand Experience",
+    description:
+      "A refined digital experience created to communicate luxury, beauty and a premium customer journey.",
+    image:
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=85",
+  },
+  {
+    slug: "dreta-cares",
+    number: "04",
+    title: "DRETA Cares",
+    category: "Social Impact • Counselling • Platform",
+    description:
+      "An anonymous counselling platform designed around privacy, accessibility and human connection.",
+    image:
+      "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=1400&q=85",
+  },
+];
+
+const ongoingProjects = [
+  {
+    title: "EduTek",
+    description:
+      "An education-focused technology project being developed to connect learning with the possibilities of modern digital tools.",
+  },
+  {
+    title: "Onje",
+    description:
+      "A digital product currently in development, built around a focused experience and a clear product vision.",
+  },
+  {
+    title: "Rektify",
+    description:
+      "A developing digital solution exploring how technology can simplify problems and create better outcomes.",
+  },
+];
+
+/* =========================================================
+   SELECTED WORK
+========================================================= */
 
 function SelectedWork() {
   const reveal = useReveal();
 
   return (
-    <section className="bg-white py-28 sm:py-36">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+    <section className="bg-white px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto max-w-7xl">
         <motion.div
           {...reveal}
-          className="mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"
+          className="flex flex-col justify-between gap-8 md:flex-row md:items-end"
         >
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-              03 / Selected Work
-            </p>
+            <SectionLabel number="03">Selected Work</SectionLabel>
 
-            <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
-              THINGS
+            <h2 className="max-w-4xl text-5xl font-black tracking-[-0.05em] text-slate-950 md:text-7xl">
+              IDEAS WE'VE
               <br />
-              WE'VE BUILT.
+              <span className="text-blue-600">BROUGHT TO LIFE.</span>
             </h2>
           </div>
 
           <Link
             to="/work"
-            className="inline-flex items-center gap-2 font-black text-blue-700"
+            className="group flex items-center gap-2 font-bold text-blue-700"
           >
-            See all work
-            <ArrowRight size={18} />
+            View all work
+            <ArrowRight
+              size={18}
+              className="transition-transform group-hover:translate-x-1"
+            />
           </Link>
         </motion.div>
 
-        <div className="grid gap-7 lg:grid-cols-2">
+        <div className="mt-14 grid gap-7 md:grid-cols-2">
           {completedProjects.map((project, index) => (
             <motion.div
-              key={project.title}
+              key={project.slug}
               {...reveal}
               transition={{
-                duration: 0.7,
-                delay: index * 0.05,
-                ease: "easeOut",
+                ...revealTransition,
+                delay: index * 0.07,
               }}
             >
               <Link
-                to={project.path}
-                className="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.06)] transition hover:-translate-y-2 hover:shadow-2xl"
+                to={`/work/${project.slug}`}
+                className="group block overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-900/10"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-blue-50">
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                   <SmartImage
                     src={project.image}
                     alt={project.title}
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    fallbackClassName="h-full w-full"
                   />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/65 via-transparent to-transparent opacity-70" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent opacity-60" />
 
-                  <div className="absolute left-5 top-5 rounded-full bg-white/95 px-4 py-2 text-xs font-black text-slate-800 backdrop-blur">
+                  <div className="absolute left-5 top-5 rounded-full bg-white/90 px-3 py-1.5 font-mono text-xs font-bold text-slate-700 backdrop-blur">
                     {project.number}
                   </div>
 
-                  <div className="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full bg-white text-blue-700 shadow-lg transition group-hover:rotate-45">
-                    <ArrowUpRight size={20} />
+                  <div className="absolute bottom-5 right-5">
+                    <ProjectArrow />
                   </div>
                 </div>
 
-                <div className="p-7 sm:p-9">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">
+                <div className="p-7">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-600">
                     {project.category}
                   </p>
 
-                  <h3 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                  <h3 className="mt-3 text-2xl font-black tracking-tight text-slate-950">
                     {project.title}
                   </h3>
 
-                  <p className="mt-4 leading-7 text-slate-600">
+                  <p className="mt-3 leading-7 text-slate-500">
                     {project.description}
                   </p>
                 </div>
@@ -777,63 +777,66 @@ function SelectedWork() {
 }
 
 /* =========================================================
-   Ongoing work
-   ========================================================= */
+   ONGOING
+========================================================= */
 
 function OngoingWork() {
   const reveal = useReveal();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-[#0e2f93] py-28 text-white sm:py-36">
-      <div className="absolute -right-48 top-20 h-[500px] w-[500px] rounded-full bg-cyan-400/20 blur-3xl" />
-      <div className="absolute -left-48 bottom-0 h-[400px] w-[400px] rounded-full bg-white/10 blur-3xl" />
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 px-5 py-24 text-white md:px-8 md:py-32">
+      <div className="absolute right-[-12rem] top-[-12rem] h-[35rem] w-[35rem] rounded-full bg-cyan-300/20 blur-3xl" />
 
-      <div className="relative mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-        <motion.div {...reveal} className="mb-14 max-w-4xl">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-200">
-            04 / Currently Building
-          </p>
+      <div className="relative mx-auto max-w-7xl">
+        <motion.div {...reveal}>
+          <SectionLabel number="04">
+            <span className="text-blue-100">Currently Building</span>
+          </SectionLabel>
 
-          <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] sm:text-7xl">
-            THE WORK
-            <br />
-            ISN'T OVER.
-          </h2>
+          <div className="grid gap-12 lg:grid-cols-[1fr_0.8fr]">
+            <div>
+              <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] md:text-7xl">
+                SOME THINGS
+                <br />
+                ARE STILL
+                <br />
+                <span className="text-cyan-200">BECOMING.</span>
+              </h2>
+            </div>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-100">
-            Some ideas are already live. Others are still becoming. These are
-            the projects currently being shaped inside PHILEdev.
-          </p>
+            <p className="max-w-xl text-lg leading-8 text-blue-50">
+              These projects are actively in development. They are not presented
+              as completed products. They represent ideas currently being shaped,
+              tested and built.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="divide-y divide-white/15 border-y border-white/15">
-          {ongoingProjects.map((project) => (
+        <div className="mt-14 grid gap-4 md:grid-cols-3">
+          {ongoingProjects.map((project, index) => (
             <motion.div
               key={project.title}
               {...reveal}
-              className="grid gap-6 py-8 md:grid-cols-[80px_1fr_auto] md:items-center"
+              transition={{
+                ...revealTransition,
+                delay: index * 0.07,
+              }}
+              className="rounded-[2rem] border border-white/15 bg-white/10 p-7 backdrop-blur-sm"
             >
-              <span className="text-sm font-black text-white/40">
-                {project.number}
+              <span className="font-mono text-xs text-blue-100">
+                IN DEVELOPMENT / 0{index + 1}
               </span>
 
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">
-                  {project.category}
-                </p>
+              <h3 className="mt-8 text-3xl font-black">{project.title}</h3>
 
-                <h3 className="mt-2 text-3xl font-black">
-                  {project.title}
-                </h3>
+              <p className="mt-4 leading-7 text-blue-50/85">
+                {project.description}
+              </p>
 
-                <p className="mt-3 max-w-2xl leading-7 text-blue-100">
-                  {project.description}
-                </p>
+              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-white">
+                Currently building
+                <span className="h-2 w-2 rounded-full bg-cyan-200" />
               </div>
-
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-wider text-white">
-                In Development
-              </span>
             </motion.div>
           ))}
         </div>
@@ -843,75 +846,77 @@ function OngoingWork() {
 }
 
 /* =========================================================
-   Founder
-   ========================================================= */
+   FOUNDER
+========================================================= */
 
 function Founder() {
   const reveal = useReveal();
 
   return (
-    <section className="bg-[#f4f8ff] py-28 sm:py-36">
-      <div className="mx-auto grid max-w-[1500px] gap-14 px-5 sm:px-8 lg:grid-cols-[.8fr_1.2fr] lg:px-10 lg:items-center">
+    <section className="bg-white px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
         <motion.div {...reveal} className="relative">
-          <div className="absolute -inset-5 rounded-[3rem] bg-blue-200/50 blur-2xl" />
+          <div className="absolute -inset-4 rounded-[2.5rem] bg-blue-100 blur-2xl" />
 
-          <div className="relative overflow-hidden rounded-[2.5rem] border-8 border-white bg-white shadow-2xl">
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-100">
             <SmartImage
-              src={ASSETS.founderFull}
-              alt="PHILEdev founder"
-              className="aspect-[4/5] w-full object-cover"
-              fallbackClassName="aspect-[4/5]"
+              src={ASSETS.founderPortrait}
+              alt="PHILEdev founder portrait"
+              className="aspect-[4/5] h-full w-full object-cover"
             />
+          </div>
+
+          <div className="absolute -bottom-5 -right-5 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-400">
+              Founder
+            </p>
+            <p className="mt-1 font-black text-slate-950">
+              Ugoji Michael Chidera
+            </p>
           </div>
         </motion.div>
 
         <motion.div {...reveal}>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-            05 / The Founder
-          </p>
+          <SectionLabel number="05">The Person Behind PHILEdev</SectionLabel>
 
-          <h2 className="mt-5 text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 sm:text-7xl">
+          <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 md:text-7xl">
             BUILT BY
             <br />
             CURIOSITY.
             <br />
-            <span className="text-blue-700">DRIVEN BY POSSIBILITY.</span>
+            <span className="text-blue-600">DRIVEN BY POSSIBILITY.</span>
           </h2>
 
-          <div className="mt-9 max-w-2xl space-y-5 text-lg leading-8 text-slate-600">
+          <div className="mt-8 max-w-2xl space-y-5 text-base leading-8 text-slate-600">
             <p>
-              PHILEdev was founded by{" "}
-              <strong className="text-slate-950">
-                Ugoji Michael Chidera
-              </strong>
-              , driven by a desire to do more, experience more and understand
-              more.
+              PHILEdev comes from a simple idea: there is always more to learn,
+              more to experience, more to create and more to build.
             </p>
 
             <p>
-              At the heart of PHILEdev is a love for technology and
-              development, and a belief that there is more to the future than
-              what already exists.
+              Its founder, Ugoji Michael Chidera, is driven by a deep interest
+              in technology and development and by the belief that more people
+              can build meaningful things with the opportunities technology
+              creates.
             </p>
 
             <p>
-              The goal is simple: create digital experiences and systems that
-              help people and businesses discover what is possible beyond the
-              ordinary.
+              PHILEdev is an expression of that belief: technology should not
+              simply exist. It should create possibility.
             </p>
           </div>
 
-          <div className="mt-9 flex flex-wrap gap-3">
-            {["Curiosity", "Technology", "Development", "Possibility"].map(
-              (item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-blue-200 bg-white px-4 py-2 text-sm font-bold text-blue-700"
-                >
-                  {item}
-                </span>
-              ),
-            )}
+          <div className="mt-9">
+            <Link
+              to="/about"
+              className="group inline-flex items-center gap-2 font-bold text-blue-700"
+            >
+              More about PHILEdev
+              <ArrowRight
+                size={18}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
           </div>
         </motion.div>
       </div>
@@ -920,84 +925,68 @@ function Founder() {
 }
 
 /* =========================================================
-   Why PHILEdev
-   ========================================================= */
+   WHY PHILEdev
+========================================================= */
+
+const principles = [
+  {
+    title: "Think Beyond the Brief",
+    text: "We don't only ask what needs to be built. We ask what the thing could become.",
+  },
+  {
+    title: "Design with Intention",
+    text: "Every interface, interaction and decision should have a reason behind it.",
+  },
+  {
+    title: "Build for the Future",
+    text: "Technology changes. We build with adaptability, scalability and possibility in mind.",
+  },
+  {
+    title: "Make the Ordinary Uncomfortable",
+    text: "If something has always been done one way, that does not mean it has to stay that way.",
+  },
+];
 
 function WhyPhiledev() {
   const reveal = useReveal();
 
-  const reasons = [
-    {
-      number: "01",
-      title: "Think Beyond the Brief",
-      text: "We look beyond what is requested to understand what could actually be possible.",
-      icon: Sparkles,
-    },
-    {
-      number: "02",
-      title: "Design with Intention",
-      text: "Every visual and interaction should have a reason to exist.",
-      icon: PenTool,
-    },
-    {
-      number: "03",
-      title: "Build for the Future",
-      text: "Digital products should be able to evolve as ideas, people and businesses grow.",
-      icon: Rocket,
-    },
-    {
-      number: "04",
-      title: "Make the Ordinary Uncomfortable",
-      text: "We challenge familiar patterns when there is an opportunity to create something more meaningful.",
-      icon: Zap,
-    },
-  ];
-
   return (
-    <section className="bg-white py-28 sm:py-36">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-        <motion.div {...reveal} className="max-w-4xl">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-            06 / Why PHILEdev
-          </p>
+    <section className="bg-[#f5f7fa] px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto max-w-7xl">
+        <motion.div {...reveal}>
+          <SectionLabel number="06">Why PHILEdev</SectionLabel>
 
-          <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
-            DIFFERENT BY
+          <h2 className="max-w-5xl text-5xl font-black tracking-[-0.05em] text-slate-950 md:text-7xl">
+            WE DON'T BUILD
             <br />
-            <span className="text-blue-700">DESIGN.</span>
+            <span className="text-blue-600">FOR THE SAKE OF BUILDING.</span>
           </h2>
         </motion.div>
 
-        <div className="mt-16 grid gap-5 md:grid-cols-2">
-          {reasons.map((reason) => {
-            const Icon = reason.icon;
+        <div className="mt-14 divide-y divide-slate-200 border-y border-slate-200">
+          {principles.map((item, index) => (
+            <motion.div
+              key={item.title}
+              {...reveal}
+              transition={{
+                ...revealTransition,
+                delay: index * 0.05,
+              }}
+              className="grid gap-5 py-8 md:grid-cols-[100px_0.8fr_1fr] md:items-center"
+            >
+              <span className="font-mono text-sm text-blue-600">
+                0{index + 1}
+              </span>
 
-            return (
-              <motion.div
-                key={reason.number}
-                {...reveal}
-                className="group rounded-[2rem] border border-slate-200 bg-[#f8fbff] p-8 transition duration-500 hover:border-blue-200 hover:bg-blue-700 hover:text-white sm:p-10"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-blue-700 shadow-sm transition group-hover:bg-white/15 group-hover:text-white">
-                    <Icon size={22} />
-                  </div>
+              <h3 className="text-2xl font-black tracking-tight text-slate-950">
+                {item.title}
+              </h3>
 
-                  <span className="font-black text-slate-300 group-hover:text-white/40">
-                    {reason.number}
-                  </span>
-                </div>
-
-                <h3 className="mt-12 text-2xl font-black">
-                  {reason.title}
-                </h3>
-
-                <p className="mt-4 leading-7 text-slate-600 transition group-hover:text-white/75">
-                  {reason.text}
-                </p>
-              </motion.div>
-            );
-          })}
+              <p className="max-w-xl leading-7 text-slate-500">
+                {item.text}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -1005,75 +994,82 @@ function WhyPhiledev() {
 }
 
 /* =========================================================
-   Process
-   ========================================================= */
+   PROCESS
+========================================================= */
+
+const processSteps = [
+  {
+    number: "01",
+    title: "Discover",
+    text: "We understand the idea, audience, problem, opportunity and desired outcome.",
+  },
+  {
+    number: "02",
+    title: "Define",
+    text: "We turn the idea into a clear digital direction, structure and project scope.",
+  },
+  {
+    number: "03",
+    title: "Design",
+    text: "We shape the experience, interface and visual language around the people using it.",
+  },
+  {
+    number: "04",
+    title: "Develop",
+    text: "We transform the approved direction into a functional digital product.",
+  },
+  {
+    number: "05",
+    title: "Deploy",
+    text: "We prepare the project for launch and help move it from idea into the real world.",
+  },
+];
 
 function Process() {
   const reveal = useReveal();
 
-  const steps = [
-    {
-      number: "01",
-      title: "Discover",
-      text: "We understand the idea, audience, problem and opportunity.",
-    },
-    {
-      number: "02",
-      title: "Define",
-      text: "We turn the opportunity into a clear digital direction.",
-    },
-    {
-      number: "03",
-      title: "Design",
-      text: "We create the experience, interface and visual language.",
-    },
-    {
-      number: "04",
-      title: "Develop",
-      text: "We turn the design into a responsive working product.",
-    },
-    {
-      number: "05",
-      title: "Deploy",
-      text: "We prepare the product for the real world and its next stage.",
-    },
-  ];
-
   return (
-    <section className="bg-[#eef5ff] py-28 sm:py-36">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+    <section className="bg-[#f2f8ff] px-5 py-24 md:px-8 md:py-32">
+      <div className="mx-auto max-w-7xl">
         <motion.div {...reveal}>
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-            07 / Process
-          </p>
+          <SectionLabel number="07">The Process</SectionLabel>
 
-          <h2 className="mt-4 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
-            FROM IDEA
-            <br />
-            TO <span className="text-blue-700">REALITY.</span>
-          </h2>
+          <div className="grid gap-8 lg:grid-cols-2">
+            <h2 className="text-5xl font-black leading-[0.95] tracking-[-0.05em] text-slate-950 md:text-7xl">
+              FROM
+              <br />
+              <span className="text-blue-600">IDEA</span>
+              <br />
+              TO REALITY.
+            </h2>
+
+            <p className="max-w-xl text-lg leading-8 text-slate-600 lg:pt-8">
+              A simple process designed to keep ideas moving without losing
+              sight of the people, business and purpose behind them.
+            </p>
+          </div>
         </motion.div>
 
-        <div className="mt-16 overflow-hidden rounded-[2rem] border border-blue-100 bg-white">
-          {steps.map((step, index) => (
+        <div className="mt-16 grid gap-3 md:grid-cols-5">
+          {processSteps.map((step, index) => (
             <motion.div
               key={step.number}
               {...reveal}
-              className={`grid gap-6 p-8 sm:p-10 lg:grid-cols-[100px_280px_1fr] lg:items-center ${
-                index !== steps.length - 1
-                  ? "border-b border-slate-100"
-                  : ""
-              }`}
+              transition={{
+                ...revealTransition,
+                delay: index * 0.05,
+              }}
+              className="rounded-[1.75rem] border border-blue-100 bg-white p-6 shadow-sm"
             >
-              <span className="text-sm font-black text-blue-700">
+              <span className="font-mono text-xs font-bold text-blue-600">
                 {step.number}
               </span>
 
-              <h3 className="text-3xl font-black text-slate-950">
+              <h3 className="mt-10 text-xl font-black text-slate-950">
                 {step.title}
               </h3>
 
-              <p className="max-w-2xl leading-7 text-slate-600">
+              <p className="mt-3 text-sm leading-6 text-slate-500">
                 {step.text}
               </p>
             </motion.div>
@@ -1085,38 +1081,50 @@ function Process() {
 }
 
 /* =========================================================
-   Final CTA
-   ========================================================= */
+   FINAL CTA
+========================================================= */
 
 function FinalCTA() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 py-28 text-white sm:py-36">
-      <div className="absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-white/10 blur-3xl" />
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-cyan-500 px-5 py-24 text-white md:px-8 md:py-32">
+      <div className="absolute inset-0 opacity-20">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)",
+            backgroundSize: "55px 55px",
+          }}
+        />
+      </div>
 
-      <div className="relative mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+      <div className="relative mx-auto max-w-7xl">
         <div className="max-w-5xl">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-white/70">
-            08 / Let's Build
+          <p className="mb-6 text-xs font-black uppercase tracking-[0.25em] text-blue-100">
+            What are you building?
           </p>
 
-          <h2 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] sm:text-8xl">
-            HAVE SOMETHING
+          <h2 className="text-6xl font-black leading-[0.9] tracking-[-0.06em] md:text-8xl">
+            WHAT IF
             <br />
-            WORTH BUILDING?
+            THERE'S
+            <br />
+            MORE?
           </h2>
 
-          <p className="mt-8 max-w-2xl text-lg leading-8 text-white/80 sm:text-xl">
-            Tell us what you're imagining. Let's explore what it could become.
+          <p className="mt-8 max-w-xl text-lg leading-8 text-blue-50">
+            Tell us what you have in mind. An idea, a business, a problem, a
+            product or something that does not exist yet.
           </p>
 
           <Link
             to="/contact"
-            className="group mt-9 inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 font-black text-blue-700 shadow-2xl transition hover:-translate-y-1"
+            className="group mt-9 inline-flex items-center gap-3 rounded-2xl bg-white px-6 py-4 font-black text-blue-700 shadow-2xl transition hover:-translate-y-1"
           >
-            START A PROJECT
+            Let's Build Something
             <ArrowUpRight
-              size={18}
-              className="transition-transform group-hover:-translate-y-1 group-hover:translate-x-1"
+              size={19}
+              className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
             />
           </Link>
         </div>
@@ -1126,52 +1134,60 @@ function FinalCTA() {
 }
 
 /* =========================================================
-   Footer
-   ========================================================= */
+   FOOTER
+========================================================= */
 
 function Footer() {
   return (
-    <footer className="bg-[#071633] py-16 text-white">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-        <div className="grid gap-12 lg:grid-cols-[1.2fr_.8fr_.8fr]">
+    <footer className="bg-slate-950 px-5 py-14 text-white md:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.5fr_0.7fr_0.7fr_0.9fr]">
           <div>
-            <SmartImage
-              src={ASSETS.logo}
-              alt="PHILEdev"
-              className="h-10 w-auto rounded-md object-contain"
-              fallbackClassName="h-10 w-28 rounded-lg"
-            />
+            <div className="inline-flex rounded-xl bg-white p-2">
+              <SmartImage
+                src={ASSETS.logo}
+                alt="PHILEdev"
+                className="h-9 w-auto object-contain"
+              />
+            </div>
 
-            <p className="mt-5 max-w-md text-lg leading-8 text-blue-100/70">
-              The love of development. Building digital experiences,
-              products and systems for what comes next.
+            <p className="mt-6 max-w-sm text-sm leading-7 text-slate-400">
+              Technology, digital experiences and software built around the
+              belief that there is always more to create.
+            </p>
+
+            <p className="mt-5 font-mono text-xs uppercase tracking-[0.18em] text-blue-400">
+              The love of development.
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
               Explore
             </p>
 
-            <div className="mt-5 flex flex-col gap-3">
-              <Link className="text-blue-100/70 hover:text-white" to="/work">
+            <div className="mt-5 space-y-3">
+              <Link
+                to="/work"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
                 Work
               </Link>
-
               <Link
-                className="text-blue-100/70 hover:text-white"
                 to="/services"
+                className="block text-sm text-slate-300 transition hover:text-white"
               >
                 Services
               </Link>
-
-              <Link className="text-blue-100/70 hover:text-white" to="/about">
+              <Link
+                to="/about"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
                 About
               </Link>
-
               <Link
-                className="text-blue-100/70 hover:text-white"
                 to="/process"
+                className="block text-sm text-slate-300 transition hover:text-white"
               >
                 Process
               </Link>
@@ -1179,14 +1195,47 @@ function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+              Projects
+            </p>
+
+            <div className="mt-5 space-y-3">
+              <Link
+                to="/work/fwl-travels-tours"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
+                FWL Travels & Tours
+              </Link>
+              <Link
+                to="/work/kaycee"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
+                Kaycee
+              </Link>
+              <Link
+                to="/work/zoba-elite-spa"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
+                ZOBA ELITE SPA
+              </Link>
+              <Link
+                to="/work/dreta-cares"
+                className="block text-sm text-slate-300 transition hover:text-white"
+              >
+                DRETA Cares
+              </Link>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
               Contact
             </p>
 
-            <div className="mt-5 flex flex-col gap-3">
+            <div className="mt-5 space-y-4">
               <a
                 href={`tel:${WHATSAPP_NUMBER}`}
-                className="text-blue-100/70 hover:text-white"
+                className="block text-sm text-slate-300 transition hover:text-white"
               >
                 {PHONE_NUMBER}
               </a>
@@ -1195,18 +1244,19 @@ function Footer() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 text-blue-100/70 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-emerald-400"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={17} />
                 WhatsApp
               </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col justify-between gap-4 border-t border-white/10 pt-7 text-sm text-blue-100/40 sm:flex-row">
+        <div className="mt-14 flex flex-col justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-500 md:flex-row">
           <p>© {new Date().getFullYear()} PHILEdev. All rights reserved.</p>
-          <p>The love of development.</p>
+
+          <p>Learn. Build. Experience. Evolve.</p>
         </div>
       </div>
     </footer>
@@ -1214,8 +1264,8 @@ function Footer() {
 }
 
 /* =========================================================
-   Home
-   ========================================================= */
+   HOME
+========================================================= */
 
 function Home() {
   return (
@@ -1234,615 +1284,121 @@ function Home() {
 }
 
 /* =========================================================
-   Work page
-   ========================================================= */
+   WORK PAGE
+========================================================= */
 
 function WorkPage() {
-  const reveal = useReveal();
-
   return (
-    <div className="bg-white pt-32">
-      <section className="bg-[#f4f8ff] py-24 sm:py-32">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-          <motion.div {...reveal} className="max-w-5xl">
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-              PHILEdev / Work
-            </p>
-
-            <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 sm:text-8xl">
-              SELECTED
-              <br />
-              <span className="text-blue-700">WORK.</span>
-            </h1>
-
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
-              A selection of digital experiences, products and platforms
-              created by PHILEdev.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <SelectedWork />
-      <OngoingWork />
-      <FinalCTA />
-    </div>
-  );
-}
-
-/* =========================================================
-   Services page
-   ========================================================= */
-
-function ServicesPage() {
-  const reveal = useReveal();
-
-  return (
-    <div className="bg-white pt-32">
-      <section className="bg-[#f4f8ff] py-24 sm:py-32">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-          <motion.div {...reveal} className="max-w-5xl">
-            <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-              PHILEdev / Services
-            </p>
-
-            <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 sm:text-8xl">
-              WHAT WE
-              <br />
-              <span className="text-blue-700">BUILD.</span>
-            </h1>
-
-            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
-              Digital experiences and technology solutions designed around
-              ideas that deserve more.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-          <div className="grid gap-5 md:grid-cols-2">
-            {services.map((service) => {
-              const Icon = service.icon;
-
-              return (
-                <motion.div
-                  key={service.number}
-                  {...reveal}
-                  className="rounded-[2rem] border border-slate-200 bg-[#f8fbff] p-8 sm:p-12"
-                >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-700 text-white">
-                    <Icon size={25} />
-                  </div>
-
-                  <p className="mt-10 text-xs font-black uppercase tracking-[0.2em] text-blue-700">
-                    {service.number}
-                  </p>
-
-                  <h2 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
-                    {service.title}
-                  </h2>
-
-                  <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-                    {service.description}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <FinalCTA />
-    </div>
-  );
-}
-
-/* =========================================================
-   About page
-   ========================================================= */
-
-function AboutPage() {
-  return (
-    <div className="bg-white pt-32">
-      <section className="bg-[#f4f8ff] py-24 sm:py-32">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-          <div className="grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
-            <div className="overflow-hidden rounded-[2.5rem] border-8 border-white shadow-2xl">
+    <PageShell
+      eyebrow="Selected Work"
+      title={
+        <>
+          BUILT FOR
+          <br />
+          <span className="text-blue-600">REAL WORLD</span>
+          <br />
+          POSSIBILITY.
+        </>
+      }
+      description="A collection of digital experiences, products and platforms created by PHILEdev."
+    >
+      <div className="mt-16 grid gap-7 md:grid-cols-2">
+        {completedProjects.map((project) => (
+          <Link
+            key={project.slug}
+            to={`/work/${project.slug}`}
+            className="group overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <div className="relative aspect-[16/10] overflow-hidden">
               <SmartImage
-                src={ASSETS.founderFull}
-                alt="PHILEdev founder"
-                className="aspect-[4/5] w-full object-cover"
-                fallbackClassName="aspect-[4/5]"
+                src={project.image}
+                alt={project.title}
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
-            </div>
 
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-                PHILEdev / About
-              </p>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
 
-              <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 sm:text-8xl">
-                THERE'S
-                <br />
-                <span className="text-blue-700">MORE.</span>
-              </h1>
-
-              <div className="mt-8 max-w-2xl space-y-5 text-lg leading-8 text-slate-600">
-                <p>
-                  PHILEdev comes from a simple idea: a love for development
-                  and a belief that there is always more to build.
+              <div className="absolute bottom-5 left-5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-100">
+                  {project.category}
                 </p>
+                <h2 className="mt-2 text-3xl font-black text-white">
+                  {project.title}
+                </h2>
+              </div>
 
-                <p>
-                  Founded by Ugoji Michael Chidera, PHILEdev exists to explore
-                  the intersection between technology, creativity and
-                  possibility.
-                </p>
-
-                <p>
-                  We build digital experiences, products and systems for
-                  people and businesses that believe their ideas can become
-                  something greater.
-                </p>
+              <div className="absolute right-5 top-5">
+                <ProjectArrow />
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </Link>
+        ))}
+      </div>
 
-      <WhyPhiledev />
-      <FinalCTA />
-    </div>
+      <div className="mt-24 rounded-[2.5rem] bg-gradient-to-br from-blue-700 to-cyan-500 p-8 text-white md:p-12">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-100">
+          Currently Building
+        </p>
+
+        <h2 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">
+          EduTek. Onje. Rektify.
+        </h2>
+
+        <p className="mt-5 max-w-2xl leading-8 text-blue-50">
+          These are ongoing projects and are intentionally separated from the
+          completed portfolio.
+        </p>
+      </div>
+    </PageShell>
   );
 }
 
 /* =========================================================
-   Process page
-   ========================================================= */
+   PROJECT DETAIL
+========================================================= */
 
-function ProcessPage() {
-  return (
-    <div className="pt-32">
-      <Process />
-      <section className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-4xl px-5 text-center sm:px-8">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-            Philosophy
-          </p>
+function ProjectPage() {
+  const { pathname } = useLocation();
+  const slug = pathname.split("/").filter(Boolean).pop();
 
-          <h2 className="mt-5 text-5xl font-black tracking-[-0.05em] text-slate-950 sm:text-7xl">
-            WHAT IF
-            <br />
-            <span className="text-blue-700">THERE'S MORE?</span>
-          </h2>
-
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-slate-600">
-            Every project begins with curiosity. The process exists to turn
-            that curiosity into something real.
-          </p>
-        </div>
-      </section>
-
-      <FinalCTA />
-    </div>
+  const project = completedProjects.find(
+    (item) => item.slug === slug,
   );
-}
-
-/* =========================================================
-   Contact page
-   ========================================================= */
-
-function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-  }
-
-  return (
-    <div className="bg-white pt-32">
-      <section className="bg-[#f4f8ff] py-24 sm:py-32">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
-          <div className="grid gap-14 lg:grid-cols-[.8fr_1.2fr]">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-                PHILEdev / Contact
-              </p>
-
-              <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 sm:text-8xl">
-                LET'S
-                <br />
-                <span className="text-blue-700">BUILD.</span>
-              </h1>
-
-              <p className="mt-8 max-w-lg text-lg leading-8 text-slate-600">
-                Have an idea, business or project that could become more?
-                Tell us about it.
-              </p>
-
-              <div className="mt-10 space-y-4">
-                <a
-                  href={`tel:${WHATSAPP_NUMBER}`}
-                  className="flex items-center gap-4 text-lg font-bold text-slate-900 hover:text-blue-700"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                    <MessageCircle size={19} />
-                  </div>
-
-                  {PHONE_NUMBER}
-                </a>
-
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 font-black text-blue-700 hover:text-blue-800"
-                >
-                  Continue on WhatsApp
-                  <ArrowUpRight size={17} />
-                </a>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_25px_80px_rgba(15,23,42,0.07)] sm:p-10">
-              {submitted ? (
-                <div className="flex min-h-[500px] flex-col items-center justify-center text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                    <Check size={28} />
-                  </div>
-
-                  <h2 className="mt-6 text-3xl font-black text-slate-950">
-                    Enquiry prepared.
-                  </h2>
-
-                  <p className="mt-4 max-w-md leading-7 text-slate-600">
-                    Your project details have been captured on this page.
-                    Please continue the conversation through WhatsApp to
-                    discuss your project.
-                  </p>
-
-                  <a
-                    href={WHATSAPP_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-7 inline-flex items-center gap-2 rounded-full bg-blue-700 px-6 py-3 font-black text-white"
-                  >
-                    Message PHILEdev
-                    <ArrowUpRight size={17} />
-                  </a>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <Field label="Name" placeholder="Your name" />
-                    <Field label="Company" placeholder="Company / Brand" />
-                  </div>
-
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <Field
-                      label="Email / WhatsApp"
-                      placeholder="How can we reach you?"
-                    />
-
-                    <div>
-                      <label className="mb-2 block text-sm font-black text-slate-800">
-                        Project Type
-                      </label>
-
-                      <select className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white">
-                        <option>Website</option>
-                        <option>Web Application</option>
-                        <option>Digital Product</option>
-                        <option>Software</option>
-                        <option>UI/UX Design</option>
-                        <option>Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <Field label="Services Required" placeholder="What do you need?" />
-                    <Field label="Budget Range" placeholder="Optional" />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-black text-slate-800">
-                      Timeline
-                    </label>
-
-                    <input
-                      type="text"
-                      placeholder="When would you like to begin?"
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-black text-slate-800">
-                      Project Description
-                    </label>
-
-                    <textarea
-                      rows={6}
-                      placeholder="Tell us what you're imagining..."
-                      className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-blue-700 px-6 py-4 font-black text-white shadow-xl shadow-blue-700/20 transition hover:-translate-y-0.5 hover:bg-blue-800"
-                  >
-                    SEND PROJECT ENQUIRY
-                    <Send
-                      size={18}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-/* =========================================================
-   Form field
-   ========================================================= */
-
-function Field({
-  label,
-  placeholder,
-}: {
-  label: string;
-  placeholder: string;
-}) {
-  return (
-    <div>
-      <label className="mb-2 block text-sm font-black text-slate-800">
-        {label}
-      </label>
-
-      <input
-        type="text"
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white"
-      />
-    </div>
-  );
-}
-
-/* =========================================================
-   Project detail
-   ========================================================= */
-
-function ProjectPage({ slug }: { slug: string }) {
-  const project = projectDetails[slug];
 
   if (!project) {
     return <NotFound />;
   }
 
   return (
-    <div className="bg-white pt-32">
-      <section className="bg-[#f4f8ff] py-20 sm:py-28">
-        <div className="mx-auto max-w-[1500px] px-5 sm:px-8 lg:px-10">
+    <PageTransition>
+      <section className="bg-white pt-32">
+        <div className="mx-auto max-w-7xl px-5 pb-16 md:px-8 md:pb-20">
           <Link
             to="/work"
-            className="inline-flex items-center gap-2 text-sm font-black text-blue-700"
+            className="inline-flex items-center gap-2 text-sm font-bold text-blue-700"
           >
-            ← Back to work
+            <ArrowRight className="rotate-180" size={17} />
+            Back to Work
           </Link>
 
-          <div className="mt-10 grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-                {project.eyebrow}
-              </p>
+          <div className="mt-12 max-w-5xl">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-600">
+              {project.category}
+            </p>
 
-              <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 sm:text-8xl">
-                {project.title}
-              </h1>
+            <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-[-0.06em] text-slate-950 md:text-8xl">
+              {project.title}
+            </h1>
 
-              <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
-                {project.description}
-              </p>
-            </div>
-
-            <div className="overflow-hidden rounded-[2.5rem] border-8 border-white bg-white shadow-2xl">
-              <SmartImage
-                src={project.image}
-                alt={project.title}
-                className="aspect-[16/10] w-full object-cover"
-                fallbackClassName="aspect-[16/10]"
-              />
-            </div>
+            <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
+              {project.description}
+            </p>
           </div>
         </div>
-      </section>
 
-      <section className="bg-white py-24 sm:py-32">
-        <div className="mx-auto max-w-[1100px] px-5 sm:px-8">
-          <p className="text-xs font-black uppercase tracking-[0.25em] text-blue-700">
-            The Experience
-          </p>
-
-          <h2 className="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-6xl">
-            BUILT WITH
-            <br />
-            <span className="text-blue-700">INTENTION.</span>
-          </h2>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-2">
-            {project.points.map((point) => (
-              <div
-                key={point}
-                className="flex gap-4 rounded-2xl border border-slate-200 bg-[#f8fbff] p-6"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                  <Check size={17} />
-                </div>
-
-                <p className="font-bold leading-7 text-slate-700">{point}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <FinalCTA />
-    </div>
-  );
-}
-
-/* =========================================================
-   404
-   ========================================================= */
-
-function NotFound() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f4f8ff] px-5 pt-24">
-      <div className="text-center">
-        <p className="text-sm font-black uppercase tracking-[0.25em] text-blue-700">
-          404
-        </p>
-
-        <h1 className="mt-4 text-6xl font-black text-slate-950">
-          Page not found.
-        </h1>
-
-        <Link
-          to="/"
-          className="mt-8 inline-flex rounded-full bg-blue-700 px-7 py-4 font-black text-white"
-        >
-          Back Home
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================
-   App
-   ========================================================= */
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <ScrollToTop />
-
-      <div className="min-h-screen bg-white text-slate-950">
-        <Navbar />
-
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <PageTransition>
-                <Home />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/work"
-            element={
-              <PageTransition>
-                <WorkPage />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/services"
-            element={
-              <PageTransition>
-                <ServicesPage />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/about"
-            element={
-              <PageTransition>
-                <AboutPage />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/process"
-            element={
-              <PageTransition>
-                <ProcessPage />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/contact"
-            element={
-              <PageTransition>
-                <ContactPage />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/work/fwl"
-            element={
-              <PageTransition>
-                <ProjectPage slug="fwl" />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/work/kaycee"
-            element={
-              <PageTransition>
-                <ProjectPage slug="kaycee" />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/work/zoba"
-            element={
-              <PageTransition>
-                <ProjectPage slug="zoba" />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="/work/dreta"
-            element={
-              <PageTransition>
-                <ProjectPage slug="dreta" />
-              </PageTransition>
-            }
-          />
-
-          <Route
-            path="*"
-            element={
-              <PageTransition>
-                <NotFound />
-              </PageTransition>
-            }
-          />
-        </Routes>
-
-        <Footer />
-      </div>
-    </BrowserRouter>
-  );
-}
+        <div className="mx-auto max-w-[1400px] px-5 md:px-8">
+          <div className="overflow-hidden rounded-[2.5rem]">
+            <SmartImage
+              src={project.image}
+              alt={project.title}
+              className="aspect-[16/8]
