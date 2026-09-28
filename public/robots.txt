@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://philedev.name.ng/sitemap.xml
