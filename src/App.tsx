@@ -1371,6 +1371,11 @@ function ProcessPage() {
             <br />
             REALITY.
           </h1>
+
+          <p className="mt-10 max-w-2xl text-lg leading-8 text-slate-600">
+            Every PHILEdev project begins with a question, develops through
+            clarity and design, and becomes something real through technology.
+          </p>
         </div>
       </section>
 
@@ -1411,5 +1416,616 @@ function ProcessPage() {
             <span className="text-blue-700">GOOD QUESTIONS.</span>
           </h2>
 
+          <p className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-slate-500">
+            Tell us what you are trying to build, improve or bring to life.
+            We will start from there.
+          </p>
+
           <Link
-            to="/contact
+            to="/contact"
+            className="mt-9 inline-flex items-center gap-3 rounded-full bg-blue-700 px-7 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:-translate-y-1 hover:bg-blue-800"
+          >
+            Start a Project
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+    </PageWrapper>
+  );
+}
+
+/* =========================================================
+   CONTACT / START A PROJECT PAGE
+========================================================= */
+
+function ContactPage() {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setSubmitting(true);
+    setError("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch("/api/send-enquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result?.error ||
+            "We could not send your enquiry. Please try again."
+        );
+      }
+
+      setSubmitted(true);
+      form.reset();
+    } catch (submitError) {
+      console.error("PHILEdev enquiry submission error:", submitError);
+
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Something went wrong while sending your enquiry."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <PageWrapper>
+        <section className="min-h-[80vh] bg-[#f2f8ff] px-5 pt-36 pb-24 sm:px-8 lg:px-10">
+          <div className="mx-auto flex min-h-[65vh] max-w-4xl items-center justify-center">
+            <div className="w-full rounded-[2rem] border border-blue-100 bg-white p-8 text-center shadow-xl shadow-blue-900/5 sm:p-14">
+              <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-700">
+                <Check size={38} />
+              </div>
+
+              <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+                Enquiry Received
+              </p>
+
+              <h1 className="mt-4 text-5xl font-black leading-none tracking-[-0.05em] text-slate-950 sm:text-7xl">
+                LET&apos;S
+                <br />
+                BUILD.
+              </h1>
+
+              <p className="mx-auto mt-7 max-w-xl text-lg leading-8 text-slate-600">
+                Your project enquiry has been sent successfully. PHILEdev has
+                received your information and will review your project details.
+              </p>
+
+              <div className="mt-9 flex flex-wrap justify-center gap-3">
+                <Link
+                  to="/"
+                  className="inline-flex items-center gap-2 rounded-full bg-blue-700 px-6 py-4 font-bold text-white transition hover:bg-blue-800"
+                >
+                  Back Home
+                  <ArrowRight size={18} />
+                </Link>
+
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-4 font-bold text-slate-800 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                  <MessageCircle size={18} />
+                  WhatsApp PHILEdev
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </PageWrapper>
+    );
+  }
+
+  return (
+    <PageWrapper>
+      {/* CONTACT HERO */}
+      <section className="bg-[#f2f8ff] pt-36 pb-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <SectionLabel number="01">Start a Project</SectionLabel>
+
+          <h1 className="max-w-6xl text-6xl font-black leading-[0.88] tracking-[-0.06em] text-slate-950 sm:text-8xl">
+            HAVE
+            <br />
+            SOMETHING
+            <br />
+            <span className="text-blue-700">WORTH BUILDING?</span>
+          </h1>
+
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <p className="max-w-2xl text-lg leading-8 text-slate-600">
+              Tell PHILEdev what you have in mind. Whether it is an idea,
+              business, digital product or something completely new, let&apos;s
+              explore what it can become.
+            </p>
+
+            <div className="flex flex-col gap-3 text-sm font-semibold text-slate-600">
+              <a
+                href={`tel:${PHONE.replace(/\s/g, "")}`}
+                className="flex items-center gap-3 hover:text-blue-700"
+              >
+                <MessageCircle size={18} />
+                {PHONE}
+              </a>
+
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 hover:text-blue-700"
+              >
+                <MessageCircle size={18} />
+                WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FORM */}
+      <section className="bg-white py-20 sm:py-28">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8 lg:px-10">
+          <div className="mb-12">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+              Project Enquiry
+            </p>
+
+            <h2 className="mt-4 text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">
+              LET&apos;S START WITH THE DETAILS.
+            </h2>
+
+            <p className="mt-5 max-w-2xl leading-7 text-slate-500">
+              The more context you provide, the better we can understand what
+              you want to build.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* PERSONAL INFORMATION */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Name *
+                </label>
+
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  placeholder="Your full name"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="company"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Company / Organisation
+                </label>
+
+                <input
+                  id="company"
+                  name="company"
+                  type="text"
+                  placeholder="Company or organisation name"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                />
+              </div>
+            </div>
+
+            {/* CONTACT INFORMATION */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Email *
+                </label>
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="you@example.com"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="whatsapp"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  WhatsApp / Phone
+                </label>
+
+                <input
+                  id="whatsapp"
+                  name="whatsapp"
+                  type="tel"
+                  placeholder="+234..."
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                />
+              </div>
+            </div>
+
+            {/* PROJECT INFORMATION */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="projectType"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Project Type *
+                </label>
+
+                <select
+                  id="projectType"
+                  name="projectType"
+                  required
+                  defaultValue=""
+                  className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                >
+                  <option value="" disabled>
+                    Select project type
+                  </option>
+                  <option value="Website">
+                    Website
+                  </option>
+                  <option value="Web Application">
+                    Web Application
+                  </option>
+                  <option value="Mobile Application">
+                    Mobile Application
+                  </option>
+                  <option value="Software / Custom System">
+                    Software / Custom System
+                  </option>
+                  <option value="E-commerce">
+                    E-commerce
+                  </option>
+                  <option value="AI / Automation">
+                    AI / Automation
+                  </option>
+                  <option value="Digital Marketing / SEO">
+                    Digital Marketing / SEO
+                  </option>
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="services"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Services Required
+                </label>
+
+                <input
+                  id="services"
+                  name="services"
+                  type="text"
+                  placeholder="e.g. UI/UX, development, SEO"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                />
+              </div>
+            </div>
+
+            {/* BUDGET + TIMELINE */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="budget"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Budget Range
+                </label>
+
+                <select
+                  id="budget"
+                  name="budget"
+                  defaultValue=""
+                  className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                >
+                  <option value="" disabled>
+                    Select a range
+                  </option>
+                  <option value="Below ₦100,000">
+                    Below ₦100,000
+                  </option>
+                  <option value="₦100,000 – ₦250,000">
+                    ₦100,000 – ₦250,000
+                  </option>
+                  <option value="₦250,000 – ₦500,000">
+                    ₦250,000 – ₦500,000
+                  </option>
+                  <option value="₦500,000 – ₦1,000,000">
+                    ₦500,000 – ₦1,000,000
+                  </option>
+                  <option value="₦1,000,000+">
+                    ₦1,000,000+
+                  </option>
+                  <option value="Not sure yet">
+                    Not sure yet
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="timeline"
+                  className="mb-2 block text-sm font-bold text-slate-800"
+                >
+                  Desired Timeline
+                </label>
+
+                <select
+                  id="timeline"
+                  name="timeline"
+                  defaultValue=""
+                  className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                >
+                  <option value="" disabled>
+                    Select a timeline
+                  </option>
+                  <option value="As soon as possible">
+                    As soon as possible
+                  </option>
+                  <option value="Within 2 weeks">
+                    Within 2 weeks
+                  </option>
+                  <option value="Within 1 month">
+                    Within 1 month
+                  </option>
+                  <option value="1 – 3 months">
+                    1 – 3 months
+                  </option>
+                  <option value="3+ months">
+                    3+ months
+                  </option>
+                  <option value="No fixed timeline">
+                    No fixed timeline
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            {/* SOURCE */}
+            <div>
+              <label
+                htmlFor="source"
+                className="mb-2 block text-sm font-bold text-slate-800"
+              >
+                How did you find PHILEdev?
+              </label>
+
+              <select
+                id="source"
+                name="source"
+                defaultValue=""
+                className="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+              >
+                <option value="" disabled>
+                  Select an option
+                </option>
+                <option value="Google / Search">
+                  Google / Search
+                </option>
+                <option value="WhatsApp">
+                  WhatsApp
+                </option>
+                <option value="Referral">
+                  Referral
+                </option>
+                <option value="Social Media">
+                  Social Media
+                </option>
+                <option value="Portfolio / Website">
+                  Portfolio / Website
+                </option>
+                <option value="Other">
+                  Other
+                </option>
+              </select>
+            </div>
+
+            {/* DESCRIPTION */}
+            <div>
+              <label
+                htmlFor="description"
+                className="mb-2 block text-sm font-bold text-slate-800"
+              >
+                Tell us about the project *
+              </label>
+
+              <textarea
+                id="description"
+                name="description"
+                required
+                rows={8}
+                placeholder="What are you trying to build? What problem should it solve? Tell us as much as you can..."
+                className="w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 leading-7 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+              />
+            </div>
+
+            {/* ERROR */}
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-semibold leading-6 text-red-700">
+                {error}
+              </div>
+            )}
+
+            {/* SUBMIT */}
+            <div className="flex flex-col gap-5 border-t border-slate-200 pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-md text-xs leading-5 text-slate-400">
+                By submitting this form, you are sending your project details
+                directly to PHILEdev for review.
+              </p>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="group inline-flex shrink-0 items-center justify-center gap-3 rounded-full bg-blue-700 px-7 py-4 font-bold text-white shadow-lg shadow-blue-700/20 transition hover:-translate-y-1 hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              >
+                {submitting ? (
+                  <>
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    Send Project Enquiry
+                    <Send
+                      size={18}
+                      className="transition group-hover:translate-x-1"
+                    />
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* DIRECT CONTACT */}
+      <section className="bg-[#f5f7fa] py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="rounded-[2rem] bg-white p-8 sm:p-12">
+            <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+                  Prefer a direct conversation?
+                </p>
+
+                <h2 className="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
+                  LET&apos;S TALK.
+                </h2>
+
+                <p className="mt-5 max-w-2xl leading-7 text-slate-500">
+                  You can also reach PHILEdev directly through WhatsApp or
+                  phone.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-green-600 px-6 py-4 font-bold text-white transition hover:-translate-y-1 hover:bg-green-700"
+                >
+                  <MessageCircle size={18} />
+                  WhatsApp
+                </a>
+
+                <a
+                  href={`tel:${PHONE.replace(/\s/g, "")}`}
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-4 font-bold text-slate-800 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                  <MessageCircle size={18} />
+                  Call
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </PageWrapper>
+  );
+}
+
+/* =========================================================
+   NOT FOUND
+========================================================= */
+
+function NotFound() {
+  return (
+    <PageWrapper>
+      <section className="flex min-h-[80vh] items-center justify-center bg-[#f2f8ff] px-5 pt-24">
+        <div className="max-w-2xl text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-700">
+            404
+          </p>
+
+          <h1 className="mt-5 text-6xl font-black tracking-[-0.06em] text-slate-950 sm:text-8xl">
+            PAGE NOT
+            <br />
+            FOUND.
+          </h1>
+
+          <p className="mx-auto mt-7 max-w-lg leading-7 text-slate-500">
+            The page you are looking for does not exist or may have moved.
+          </p>
+
+          <Link
+            to="/"
+            className="mt-8 inline-flex items-center gap-3 rounded-full bg-blue-700 px-6 py-4 font-bold text-white transition hover:bg-blue-800"
+          >
+            <ArrowLeft size={18} />
+            Back Home
+          </Link>
+        </div>
+      </section>
+    </PageWrapper>
+  );
+}
+
+/* =========================================================
+   APP ROUTES
+========================================================= */
+
+export default function App() {
+  return (
+    <>
+      <ScrollToTop />
+      <Navbar />
+
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/work" element={<WorkPage />} />
+          <Route path="/work/:slug" element={<ProjectPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/process" element={<ProcessPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
