@@ -763,7 +763,7 @@ function HomePage() {
               <p className="mt-8 max-w-2xl text-lg leading-8 text-slate-600">
                 PHILEdev was founded by{" "}
                 <strong className="text-slate-950">
-                  Ugoji Michael Chidera
+                  Ugorji Michael Chidera
                 </strong>
                 , driven by a desire to do more, experience more and know more.
               </p>
@@ -1321,7 +1321,7 @@ function AboutPage() {
           <div className="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
             <div>
               <h2 className="text-4xl font-black tracking-tight text-slate-950 sm:text-6xl">
-                Ugoji Michael
+                Ugorji Michael
                 <br />
                 Chidera
               </h2>
